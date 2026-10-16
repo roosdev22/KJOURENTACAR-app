@@ -1,0 +1,47 @@
+@"
+.env
+.env.*
+!.env.example
+*.sqlite3
+__pycache__/
+*.pyc
+venv/
+.venv/
+staticfiles/
+media/
+node_modules/
+dist/
+build/
+.next/
+.vscode/
+.qodo/
+.idea/
+.DS_Store
+Thumbs.db
+"@ | Set-Content -Encoding utf8 .gitignore
+*.log
+logs/
+celerybeat-schedule*
+
+body.json
+
+recormandation.txt
+
+body.json
+
+# Logs
+*.log
+logs/
+celerybeat-schedule*
+
+# Fichiers temporaires locaux
+body.json
+recormandation.txt
+
+# Sauvegardes locales de bases de données
+*.dump
+*.sql.gz
+
+# Documents privés et fichiers générés
+private_media/
+**/body.json

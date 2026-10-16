@@ -1,0 +1,147 @@
+services:
+
+  db:
+    image: postgres:16
+    container_name: kjourentacar_db
+
+    environment:
+      POSTGRES_USER: roosvelt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?La variable POSTGRES_PASSWORD doit être définie dans .env}
+      POSTGRES_DB: DB_kjourentacar
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+
+    ports:
+      - "5432:5432"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U roosvelt -d DB_kjourentacar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: kjourentacar_redis
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  backend:
+    build: ./backend
+    container_name: kjourentacar_backend
+
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+    env_file:
+      - .env
+
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+
+    volumes:
+      - ./backend:/app
+      - contracts_data:/app/private_media
+
+      
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    stdin_open: true
+    tty: true
+
+
+  celery_worker:
+    build: ./backend
+    container_name: kjourentacar_celery_worker
+
+    command: celery -A config worker --loglevel=info
+
+    env_file:
+      - .env
+
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+
+    volumes:
+      - ./backend:/app
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    stdin_open: true
+    tty: true
+
+
+  celery_beat:
+    build: ./backend
+    container_name: kjourentacar_celery_beat
+
+    command: celery -A config beat --loglevel=info
+
+    env_file:
+      - .env
+
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+
+    volumes:
+      - ./backend:/app
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    stdin_open: true
+    tty: true
+
+
+  frontend:
+    build: ./frontend
+    container_name: kjourentacar_frontend
+
+    working_dir: /app
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    ports:
+      - "5173:5173"
+
+    command: npm run dev -- --host --port 5173
+
+    depends_on:
+      - backend
+
+    stdin_open: true
+    tty: true
+
+
+volumes:
+  postgres_data:
+  contracts_data:

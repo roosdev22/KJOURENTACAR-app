@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}KJOURENTACAR{% endblock %}</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            width: 100%;
+            padding: 40px 15px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+        }
+
+        .header {
+            background: #0d6efd;
+            color: #ffffff;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 35px 30px;
+            font-size: 15px;
+        }
+
+        .content p {
+            margin-bottom: 16px;
+        }
+
+        .button {
+            display: inline-block;
+            margin: 25px 0;
+            padding: 14px 28px;
+            background: #0d6efd;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+            padding: 25px 20px;
+            font-size: 13px;
+            color: #777777;
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        .footer a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #999999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <div class="container">
+
+            <div class="header">
+
+                <!-- Tu pourras remplacer ce texte par ton logo plus tard -->
+                <h1>KJOURENTACAR</h1>
+
+                <p>Votre partenaire de location de véhicules</p>
+
+            </div>
+
+            <div class="content">
+
+                {% block content %}
+                {% endblock %}
+
+            </div>
+
+            <div class="footer">
+
+                <p>
+                    Cet email a été envoyé automatiquement par
+                    <strong>KJOURENTACAR</strong>.
+                </p>
+
+                <p>
+                    © {% now "Y" %} KJOURENTACAR. Tous droits réservés.
+                </p>
+
+                <p>
+                    Support : support@kjourentacar.com
+                </p>
+
+                <p class="small">
+                    Merci de ne pas répondre directement à cet email.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
