@@ -165,9 +165,8 @@ export interface UpdateProfilePayload {
 
 export interface PasswordResetConfirmPayload {
   token: string;
-
-  password: string;
-  password_confirm: string;
+  new_password: string;
+  confirm_password: string;
 }
 
 /**

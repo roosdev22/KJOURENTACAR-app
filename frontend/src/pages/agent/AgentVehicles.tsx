@@ -208,28 +208,24 @@ export default function AgentVehicles() {
   // ==========================================================
 
   return (
-    <div className="min-h-full bg-gray-50 p-4 md:p-6">
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
-
+    <div className="min-h-full bg-[#F4F5F6] p-4 md:p-6">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <div className="mb-1 flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black text-white">
+          <div className="mb-2 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#17191C] text-white shadow-sm">
               <CarFront size={19} />
             </div>
 
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-red-600">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4232F]">
               Parc automobile
             </span>
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-gray-950">
+          <h1 className="text-2xl font-bold tracking-tight text-[#202327]">
             Véhicules
           </h1>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-[#64748B]">
             Consultez l’état du parc automobile et les véhicules disponibles.
           </p>
         </div>
@@ -238,7 +234,7 @@ export default function AgentVehicles() {
           type="button"
           onClick={refresh}
           disabled={isLoading}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#E3E6E8] bg-white px-4 text-sm font-semibold text-[#202327] shadow-sm transition hover:border-[#D9DEE2] hover:bg-[#F8F9F9] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RefreshCw
             size={16}
@@ -254,42 +250,42 @@ export default function AgentVehicles() {
       ====================================================== */}
 
       <div className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <div className="rounded-2xl border border-[#E3E6E8] bg-white p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
             Total
           </p>
 
-          <p className="mt-2 text-2xl font-bold text-gray-950">
+          <p className="mt-2 text-2xl font-bold text-[#202327]">
             {statistics.total}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <div className="rounded-2xl border border-[#CFE7DC] bg-[#F2FBF5] p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#16845B]">
             Disponibles
           </p>
 
-          <p className="mt-2 text-2xl font-bold text-green-600">
+          <p className="mt-2 text-2xl font-bold text-[#16845B]">
             {statistics.available}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <div className="rounded-2xl border border-[#F2E3B2] bg-[#FFF9EB] p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B7791F]">
             Maintenance
           </p>
 
-          <p className="mt-2 text-2xl font-bold text-amber-600">
+          <p className="mt-2 text-2xl font-bold text-[#B7791F]">
             {statistics.maintenance}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <div className="rounded-2xl border border-[#F2D2D7] bg-[#FFF3F5] p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#B4232F]">
             Hors service
           </p>
 
-          <p className="mt-2 text-2xl font-bold text-red-600">
+          <p className="mt-2 text-2xl font-bold text-[#B4232F]">
             {statistics.outOfService}
           </p>
         </div>
@@ -299,14 +295,12 @@ export default function AgentVehicles() {
           TOOLBAR
       ====================================================== */}
 
-      <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+      <div className="mb-4 rounded-2xl border border-[#E3E6E8] bg-white p-3 shadow-sm">
         <div className="flex flex-col gap-3 lg:flex-row">
-          {/* SEARCH */}
-
           <div className="relative flex-1">
             <Search
               size={17}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]"
             />
 
             <input
@@ -314,19 +308,17 @@ export default function AgentVehicles() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Rechercher par marque, modèle ou immatriculation..."
-              className="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-100"
+              className="h-10 w-full rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] pl-10 pr-4 text-sm text-[#202327] outline-none transition placeholder:text-[#64748B] focus:border-[#B4232F] focus:bg-white focus:ring-2 focus:ring-[#F9D8DD]"
             />
           </div>
-
-          {/* FILTER BUTTON */}
 
           <button
             type="button"
             onClick={() => setShowFilters((value) => !value)}
             className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold transition ${
               showFilters
-                ? "border-red-200 bg-red-50 text-red-600"
-                : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                ? "border-[#F4C7CD] bg-[#FFF4F4] text-[#B4232F]"
+                : "border-[#E3E6E8] bg-white text-[#202327] hover:bg-[#F8F9F9]"
             }`}
           >
             <SlidersHorizontal size={16} />
@@ -338,7 +330,7 @@ export default function AgentVehicles() {
         {/* FILTERS */}
 
         {showFilters && (
-          <div className="mt-3 grid gap-3 border-t border-gray-100 pt-3 md:grid-cols-2">
+          <div className="mt-3 grid gap-3 border-t border-[#EEF0F2] pt-3 md:grid-cols-2">
             <select
               value={statusFilter}
               onChange={(event) =>
@@ -346,7 +338,7 @@ export default function AgentVehicles() {
                   event.target.value as VehicleStatus | "ALL"
                 )
               }
-              className="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="h-10 rounded-xl border border-[#E3E6E8] bg-white px-3 text-sm text-[#202327] outline-none focus:border-[#B4232F] focus:ring-2 focus:ring-[#F9D8DD]"
             >
               <option value="ALL">Tous les statuts</option>
               <option value="AVAILABLE">Disponible</option>
@@ -361,7 +353,7 @@ export default function AgentVehicles() {
               onChange={(event) =>
                 setCategoryFilter(event.target.value)
               }
-              className="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="h-10 rounded-xl border border-[#E3E6E8] bg-white px-3 text-sm text-[#202327] outline-none focus:border-[#B4232F] focus:ring-2 focus:ring-[#F9D8DD]"
             >
               <option value="ALL">Toutes les catégories</option>
 
@@ -382,8 +374,8 @@ export default function AgentVehicles() {
         {(search ||
           statusFilter !== "ALL" ||
           categoryFilter !== "ALL") && (
-          <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-            <p className="text-xs text-gray-500">
+          <div className="mt-3 flex items-center justify-between border-t border-[#EEF0F2] pt-3">
+            <p className="text-xs text-[#64748B]">
               {filteredVehicles.length} véhicule
               {filteredVehicles.length > 1 ? "s" : ""} trouvé
               {filteredVehicles.length > 1 ? "s" : ""}
@@ -392,7 +384,7 @@ export default function AgentVehicles() {
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#B4232F] hover:text-[#941C27]"
             >
               <X size={14} />
               Réinitialiser
@@ -406,15 +398,15 @@ export default function AgentVehicles() {
       ====================================================== */}
 
       {error && (
-        <div className="mb-4 flex items-center justify-between gap-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm font-medium text-red-700">
+        <div className="mb-4 flex items-center justify-between gap-4 rounded-2xl border border-[#F3C0C7] bg-[#FFF4F5] px-4 py-3">
+          <p className="text-sm font-medium text-[#B4232F]">
             {error}
           </p>
 
           <button
             type="button"
             onClick={refresh}
-            className="shrink-0 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700"
+            className="shrink-0 rounded-lg bg-[#B4232F] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#941C27]"
           >
             Réessayer
           </button>
@@ -425,38 +417,38 @@ export default function AgentVehicles() {
           TABLE
       ====================================================== */}
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-[#E3E6E8] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/80">
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">
+              <tr className="border-b border-[#EEF0F2] bg-[#F8F9FA]">
+                <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                   Véhicule
                 </th>
 
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                   Immatriculation
                 </th>
 
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                   Catégorie
                 </th>
 
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                   Statut
                 </th>
 
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                   Kilométrage
                 </th>
 
-                <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <th className="px-5 py-3 text-right text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                   Tarif / jour
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-[#EEF0F2]">
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, index) => (
                   <tr key={index}>
@@ -491,13 +483,11 @@ export default function AgentVehicles() {
                 filteredVehicles.map((vehicle: Vehicle) => (
                   <tr
                     key={vehicle.id}
-                    className="transition hover:bg-gray-50/70"
+                    className="transition hover:bg-[#F9FAFB]"
                   >
-                    {/* VEHICLE */}
-
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-11 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                        <div className="h-11 w-14 shrink-0 overflow-hidden rounded-xl bg-[#F4F5F6]">
                           {vehicle.images?.length ? (
                             <img
                               src={vehicle.images[0].image}
@@ -505,18 +495,18 @@ export default function AgentVehicles() {
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center text-gray-400">
+                            <div className="flex h-full w-full items-center justify-center text-[#64748B]">
                               <CarFront size={20} />
                             </div>
                           )}
                         </div>
 
                         <div>
-                          <p className="text-sm font-bold text-gray-900">
+                          <p className="text-sm font-bold text-[#202327]">
                             {vehicle.brand} {vehicle.model}
                           </p>
 
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-[#64748B]">
                             {vehicle.year}
                           </p>
                         </div>

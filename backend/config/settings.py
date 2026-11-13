@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ============================================================
-# SÉCURITÉ & ENVIRONNEMENT
+# SÃ‰CURITÃ‰ & ENVIRONNEMENT
 # ============================================================
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -24,13 +24,21 @@ ALLOWED_HOSTS = os.getenv(
 # ============================================================
 
 # URL du frontend React/Vite
+# FRONTEND_URL = os.getenv(
+#     "FRONTEND_URL",
+#     "http://localhost:3000",
+# )
+
+
+# URL du frontend React/Vite
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
-    "http://localhost:3000",
+    "http://localhost:5173",
 )
 
+
 # URL du backend Django
-# Utilisée notamment dans les emails de vérification
+# UtilisÃ©e notamment dans les emails de vÃ©rification
 BACKEND_URL = os.getenv(
     "BACKEND_URL",
     "http://localhost:8000",
@@ -64,6 +72,10 @@ INSTALLED_APPS = [
     "payments",
     "contracts",
     "maintenance",
+    "rapports",
+    "facturation",
+    "parametres",
+    "notifications",
 ]
 
 
@@ -115,7 +127,7 @@ TEMPLATES = [
 
 
 # ============================================================
-# BASE DE DONNÉES
+# BASE DE DONNÃ‰ES
 # ============================================================
 
 DATABASES = {
@@ -123,7 +135,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME", ""),
         "USER": os.getenv("DB_USER", ""),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
         "HOST": os.getenv("DB_HOST", ""),
         "PORT": os.getenv("DB_PORT", "5432"),
     }
@@ -169,7 +181,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=7),
-    # À passer à timedelta(minutes=15) en production
+    # Ã€ passer Ã  timedelta(minutes=15) en production
 
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 
@@ -260,7 +272,7 @@ CSRF_COOKIE_SAMESITE = "Lax"
 
 
 # ============================================================
-# EMAIL — SMTP
+# EMAIL â€” SMTP
 # ============================================================
 
 EMAIL_BACKEND = os.getenv(
@@ -448,7 +460,7 @@ LOGGING = {
 }
 
 # ============================================================
-# STOCKAGE PRIVÉ DES CONTRATS
+# STOCKAGE PRIVÃ‰ DES CONTRATS
 # ============================================================
 
 PRIVATE_MEDIA_ROOT = BASE_DIR / "private_media"
@@ -465,7 +477,7 @@ LOGS_DIR.mkdir(
 
 
 # ============================================================
-# SECURITY SETTINGS — PRODUCTION
+# SECURITY SETTINGS â€” PRODUCTION
 # ============================================================
 
 if not DEBUG:

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-
+from config.dashboard_views import AdminDashboardStatsView
 
 urlpatterns = [
     # ============================================================
@@ -62,10 +62,42 @@ urlpatterns = [
         include("contracts.urls"),
     ),
 
+    # ============================================================
+# API RAPPORTS
+# ============================================================
+    path(
+        "api/rapports/",
+        include("rapports.urls"),
+    ),
+
     
-path("api/maintenance/", include("maintenance.urls")),
+    path("api/maintenance/", include("maintenance.urls")),
+
+    path(
+        "api/admin/dashboard/",
+        AdminDashboardStatsView.as_view(),
+        name="admin-dashboard-stats",
+    ),
+
+    path(
+    "api/facturation/",
+    include("facturation.urls"),
+),
+
+
+    path(
+        "api/parametres/",
+        include("parametres.urls"),
+    ),
+
+    path(
+    "api/notifications/",
+    include("notifications.urls"),
+),
+
 
 ]
+
 
 
 

@@ -328,11 +328,11 @@ export default function AgentVehicleReturns() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex items-center gap-3 text-sm font-medium text-gray-500">
+      <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-[#E3E6E8] bg-white shadow-sm">
+        <div className="flex items-center gap-3 text-sm font-medium text-[#64748B]">
           <Loader2
             size={20}
-            className="animate-spin"
+            className="animate-spin text-[#B4232F]"
           />
           Chargement du retour...
         </div>
@@ -346,31 +346,31 @@ export default function AgentVehicleReturns() {
 
   if (error && !reservation) {
     return (
-      <div className="space-y-5">
+      <div className="space-y-5 bg-[#F4F5F6] p-4 sm:p-6">
         <button
           type="button"
           onClick={() =>
             navigate("/agent/locations")
           }
-          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-gray-900"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#64748B] transition hover:text-[#202327]"
         >
           <ArrowLeft size={17} />
           Retour aux locations
         </button>
 
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
+        <div className="rounded-2xl border border-[#F3C0C7] bg-[#FFF4F5] p-6 shadow-sm">
           <div className="flex items-start gap-3">
             <AlertCircle
               size={21}
-              className="mt-0.5 shrink-0 text-red-600"
+              className="mt-0.5 shrink-0 text-[#B4232F]"
             />
 
             <div>
-              <h1 className="font-semibold text-red-800">
+              <h1 className="font-semibold text-[#B4232F]">
                 Retour impossible
               </h1>
 
-              <p className="mt-1 text-sm text-red-700">
+              <p className="mt-1 text-sm text-[#8F1E2A]">
                 {error}
               </p>
             </div>
@@ -386,26 +386,26 @@ export default function AgentVehicleReturns() {
 
   if (success) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center">
-        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-green-600">
+      <div className="flex min-h-[420px] items-center justify-center bg-[#F4F5F6] p-4">
+        <div className="w-full max-w-md rounded-2xl border border-[#E3E6E8] bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF7F0] text-[#16845B]">
             <CheckCircle2 size={30} />
           </div>
 
-          <h1 className="mt-5 text-xl font-bold text-gray-900">
+          <h1 className="mt-5 text-xl font-bold text-[#202327]">
             Retour enregistré
           </h1>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-[#64748B]">
             Le retour des véhicules a été enregistré
             avec succès. La réservation est maintenant
             terminée.
           </p>
 
-          <div className="mt-5 flex items-center justify-center gap-2 text-xs font-medium text-gray-400">
+          <div className="mt-5 flex items-center justify-center gap-2 text-xs font-medium text-[#64748B]">
             <Loader2
               size={14}
-              className="animate-spin"
+              className="animate-spin text-[#B4232F]"
             />
             Redirection vers les locations...
           </div>
@@ -419,7 +419,7 @@ export default function AgentVehicleReturns() {
   // ============================================================
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F4F5F6] p-4 sm:p-6">
       {/* HEADER */}
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -429,23 +429,23 @@ export default function AgentVehicleReturns() {
             onClick={() =>
               navigate("/agent/locations")
             }
-            className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-gray-900"
+            className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#64748B] transition hover:text-[#202327]"
           >
             <ArrowLeft size={17} />
             Retour aux locations
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-black text-white">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#17191C] text-white shadow-sm">
               <RotateCcw size={21} />
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-2xl font-bold tracking-tight text-[#202327]">
                 Retour des véhicules
               </h1>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-[#64748B]">
                 Enregistrer l'état et le kilométrage
                 des véhicules retournés
               </p>

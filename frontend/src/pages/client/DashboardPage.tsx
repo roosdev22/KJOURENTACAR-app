@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Banknote,
-  CalendarCheck,
-  Car,
-  Clock,
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
-
+import AdminIcon, { type AdminIconName } from "../../components/admin/AdminIcon";
 import Sidebar from "../../components/layoutClient/Sidebar";
 import TopBar from "../../components/layoutClient/TopBar";
 import WelcomeBanner from "../../components/dashbordClient/WelcomeBanner";
@@ -45,6 +37,14 @@ interface Booking {
   amount: number;
   status: BookingStatus;
 }
+
+interface ClientStat {
+  label: string;
+  value: string;
+  icon: AdminIconName;
+  color: string;
+}
+
 
 /* ============================================================
    CHAMPS DU PROFIL — même liste que Sidebar et ReservationPage
@@ -268,7 +268,7 @@ export default function DashboardPage() {
      STATISTIQUES
   ---------------------------------------------------------- */
 
-  const stats = useMemo(() => {
+  const stats = useMemo<ClientStat[]>(() => {
     const total = reservations.length;
 
     const inProgress = reservations.filter(
@@ -290,25 +290,25 @@ export default function DashboardPage() {
       {
         label: "Réservations",
         value: String(total).padStart(2, "0"),
-        icon: Car,
+        icon: "car-front",
         color: "bg-red-50 text-red-600",
       },
       {
         label: "En cours",
         value: String(inProgress).padStart(2, "0"),
-        icon: Clock,
+        icon: "clock",
         color: "bg-blue-50 text-blue-600",
       },
       {
         label: "À venir",
         value: String(upcoming).padStart(2, "0"),
-        icon: CalendarCheck,
+        icon: "calendar-check",
         color: "bg-amber-50 text-amber-600",
       },
       {
         label: "Total dépensé",
         value: formatMoney(totalSpent),
-        icon: Banknote,
+        icon: "wallet",
         color: "bg-emerald-50 text-emerald-600",
       },
     ];
@@ -342,7 +342,7 @@ export default function DashboardPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="flex items-center gap-3 text-gray-600">
-          <Loader2 size={22} className="animate-spin" />
+          <AdminIcon name="loader" size={22} className="animate-spin" />
           <span>Chargement de votre espace...</span>
         </div>
       </div>
@@ -369,42 +369,50 @@ export default function DashboardPage() {
   ---------------------------------------------------------- */
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar — calcule son propre profileCompletion via useAuth */}
+    <div className="flex min-h-screen bg-[#F4F5F6] text-[#202327]">
       <Sidebar />
 
       <div className="flex flex-1 flex-col pl-64">
         <TopBar userName={userName} />
 
         <main className="flex-1 px-6 pb-10 pt-24">
-          <div className="mx-auto max-w-5xl space-y-6">
+          <div className="mx-auto max-w-6xl space-y-6">
+            <div className="flex items-center justify-between gap-3 pb-2">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#64748B]">
+                  Espace client
+                </p>
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-[#202327]">
+                  Tableau de bord
+                </h1>
+              </div>
+            </div>
+
             <WelcomeBanner userName={userName} />
 
             <StatsRow stats={stats} />
 
             {error && (
-              <div className="flex items-center justify-between gap-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3">
+              <div className="flex items-center justify-between gap-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
                 <p className="text-sm text-red-700">{error}</p>
 
                 <button
                   type="button"
                   onClick={() => void loadReservations()}
                   disabled={isLoading}
-                  className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#B4232F] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#941C27] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <RefreshCw size={15} />
+                  <AdminIcon name="refresh" size={15} />
                   Réessayer
                 </button>
               </div>
             )}
 
             {isLoading ? (
-              <div className="flex min-h-[240px] items-center justify-center rounded-xl border border-gray-100 bg-white">
-                <div className="flex items-center gap-3 text-gray-500">
-                  <Loader2 size={22} className="animate-spin" />
-                  <span className="text-sm">
-                    Chargement de vos réservations...
-                  </span>
+              <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-[#E3E6E8] bg-white shadow-[0_10px_24px_rgba(23,25,28,0.04)]">
+                <div className="flex items-center gap-3 text-[#64748B]">
+                  <AdminIcon name="loader" size={22} className="animate-spin" />
+                  <span className="text-sm">Chargement de vos réservations...</span>
                 </div>
               </div>
             ) : (
@@ -414,7 +422,6 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  {/* ProfileWidget reçoit le même calcul que Sidebar */}
                   <ProfileWidget completion={profileCompletion} />
                   <NextBookingWidget booking={nextBooking} />
                 </div>

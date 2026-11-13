@@ -1163,32 +1163,46 @@ class ResetPasswordSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        if (
-            attrs["new_password"]
-            != attrs["confirm_password"]
-        ):
+        if attrs["new_password"] != attrs["confirm_password"]:
             raise serializers.ValidationError({
                 "confirm_password": (
                     "Les mots de passe ne correspondent pas."
                 )
             })
 
-        reset_token = PasswordResetToken.objects.filter(
+        reset_token = PasswordResetToken.objects.select_related(
+            "user"
+        ).filter(
             token=attrs["token"]
         ).first()
 
         if not reset_token or not reset_token.is_valid():
             raise serializers.ValidationError({
-                "token": "Token invalide ou expiré."
+                "token": "Ce lien est invalide ou a expiré."
             })
 
-        validate_password(
-            attrs["new_password"],
-            user=reset_token.user,
-        )
+        user = reset_token.user
+
+        if not user.is_active or user.deleted_at is not None:
+            raise serializers.ValidationError({
+                "token": (
+                    "Ce compte est inactif ou supprimé. "
+                    "La réinitialisation du mot de passe est impossible."
+                )
+            })
+
+        if user.role != RoleChoices.CLIENT:
+            raise serializers.ValidationError({
+                "token": (
+                    "Ce lien ne permet pas de réinitialiser "
+                    "le mot de passe de ce compte."
+                )
+            })
+
+        validate_password(attrs["new_password"], user=user)
 
         attrs["reset_token"] = reset_token
-        attrs["user"] = reset_token.user
+        attrs["user"] = user
 
         return attrs
 
@@ -1582,6 +1596,64 @@ class AuditHistorySerializer(serializers.Serializer):
             if change.field
             not in ["password", "last_login"]
         ]
+
+
+
+class AgentProfileSerializer(serializers.ModelSerializer):
+    """
+    Modification limitée au profil personnel de l'agent.
+    Les champs non déclarés ne sont pas modifiables via ce sérialiseur.
+    """
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+            "address",
+            "role",
+        ]
+        read_only_fields = [
+            "id",
+            "email",
+            "role",
+        ]
+
+    def validate_first_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "Le prénom est obligatoire."
+            )
+        return value
+
+    def validate_last_name(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "Le nom est obligatoire."
+            )
+        return value
+
+    def validate_phone(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "Le numéro de téléphone est obligatoire."
+            )
+        return value
+
+    def validate_address(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "L'adresse est obligatoire."
+            )
+        return value
+
 
 class ClientProfileSerializer(serializers.ModelSerializer):
     class Meta:

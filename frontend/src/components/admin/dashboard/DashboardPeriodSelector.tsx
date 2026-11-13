@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronDown } from "lucide-react";
+import AdminIcon from "../AdminIcon";
 
 export type DashboardPeriod =
   | "today"
@@ -24,7 +24,8 @@ export default function DashboardPeriodSelector({
 }: DashboardPeriodSelectorProps) {
   return (
     <div className="relative flex items-center">
-      <CalendarDays
+      <AdminIcon
+        name="reservation"
         size={17}
         className="absolute left-3 pointer-events-none text-black/40"
       />
@@ -37,19 +38,20 @@ export default function DashboardPeriodSelector({
         className="
           appearance-none
           bg-white
-          border border-black/10
-          rounded-lg
+          border border-kjou-border
+          rounded-kjou-control
           pl-9 pr-9
           py-2
           text-sm
           font-medium
-          text-black
+          text-kjou-text
           outline-none
           cursor-pointer
           transition
-          focus:border-red-700
+          focus:border-kjou-red
           focus:ring-2
-          focus:ring-red-700/10
+          focus:ring-kjou-red/10
+          focus-visible:outline-none
         "
         aria-label="Sélectionner une période"
       >
@@ -63,9 +65,10 @@ export default function DashboardPeriodSelector({
         ))}
       </select>
 
-      <ChevronDown
+      <AdminIcon
+        name="chevron-down"
         size={15}
-        className="absolute right-3 pointer-events-none text-black/40"
+        className="pointer-events-none absolute right-3 text-kjou-muted"
       />
     </div>
   );

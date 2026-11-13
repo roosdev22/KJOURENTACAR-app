@@ -1,10 +1,5 @@
-import {
-  X,
-  Trash2,
-  AlertTriangle,
-} from "lucide-react";
-
 import type { User } from "../../../api/services/authService";
+import AdminIcon from "../AdminIcon";
 
 interface DeleteUserModalProps {
   open: boolean;
@@ -104,7 +99,7 @@ export default function DeleteUserModal({
             aria-label="Fermer"
             title="Fermer"
           >
-            <X size={18} />
+            <AdminIcon name="x" size={18} />
           </button>
         </div>
 
@@ -125,7 +120,8 @@ export default function DeleteUserModal({
               border-red-100
             "
           >
-            <AlertTriangle
+            <AdminIcon
+              name="alert-triangle"
               size={22}
               className="
                 text-red-600
@@ -243,7 +239,8 @@ export default function DeleteUserModal({
                 transition
               "
             >
-              <Trash2
+              <AdminIcon
+                name="trash"
                 size={16}
                 aria-hidden="true"
               />

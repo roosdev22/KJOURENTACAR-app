@@ -1,12 +1,4 @@
-import {
-  CarFront,
-  CheckCircle2,
-  Clock3,
-  Eye,
-  ShieldCheck,
-  XCircle,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import AdminIcon, { type AdminIconName } from "../admin/AdminIcon";
 import { useNavigate } from "react-router-dom";
 
 import type {
@@ -20,7 +12,7 @@ interface ReservationCardProps {
 
 interface StatusConfig {
   label: string;
-  icon: LucideIcon;
+  icon: AdminIconName;
   className: string;
 }
 
@@ -29,7 +21,7 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
     case "PENDING_VERIFICATION":
       return {
         label: "En attente de vérification",
-        icon: Clock3,
+        icon: "clock",
         className:
           "border-amber-200 bg-amber-50 text-amber-700",
       };
@@ -37,7 +29,7 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
     case "CONFIRMED":
       return {
         label: "Confirmée",
-        icon: CheckCircle2,
+        icon: "check-circle",
         className:
           "border-emerald-200 bg-emerald-50 text-emerald-700",
       };
@@ -45,7 +37,7 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
     case "CANCELLED":
       return {
         label: "Annulée",
-        icon: XCircle,
+        icon: "x-circle",
         className:
           "border-red-200 bg-red-50 text-red-700",
       };
@@ -53,7 +45,7 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
     case "EN_COURS":
       return {
         label: "En cours",
-        icon: CarFront,
+        icon: "car-front",
         className:
           "border-blue-200 bg-blue-50 text-blue-700",
       };
@@ -61,9 +53,17 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
     case "TERMINEE":
       return {
         label: "Terminée",
-        icon: CheckCircle2,
+        icon: "check-circle",
         className:
           "border-neutral-200 bg-neutral-100 text-neutral-600",
+      };
+
+      case "EXPIRED":
+      return {
+        label: "Expirée",
+        icon: "clock",
+        className:
+          "border-orange-200 bg-orange-50 text-orange-700",
       };
   }
 }
@@ -101,8 +101,6 @@ export default function ReservationCard({
   const navigate = useNavigate();
 
   const status = getStatusConfig(reservation.statut);
-  const StatusIcon = status.icon;
-
   const vehicleCount = reservation.lignes.length;
 
   function handleViewDetails(): void {
@@ -136,12 +134,7 @@ export default function ReservationCard({
                 shadow-sm
               "
             >
-              <CarFront
-                size={21}
-                strokeWidth={2}
-                className="text-white"
-                aria-hidden="true"
-              />
+              <AdminIcon name="car-front" size={21} className="text-white" />
             </div>
 
             <div className="min-w-0">
@@ -170,7 +163,7 @@ export default function ReservationCard({
               status.className,
             ].join(" ")}
           >
-            <StatusIcon size={14} aria-hidden="true" />
+            <AdminIcon name={status.icon} size={14} />
 
             <span>
               {reservation.statut_display || status.label}
@@ -263,11 +256,7 @@ export default function ReservationCard({
                   shadow-sm
                 "
               >
-                <CarFront
-                  size={14}
-                  className="text-neutral-400"
-                  aria-hidden="true"
-                />
+                <AdminIcon name="car-front" size={14} className="text-neutral-400" />
 
                 <span>
                   {ligne.vehicule.brand} {ligne.vehicule.model}
@@ -337,7 +326,7 @@ export default function ReservationCard({
               sm:w-auto
             "
           >
-            <Eye size={16} aria-hidden="true" />
+            <AdminIcon name="eye" size={16} />
             Voir la réservation
           </button>
         </div>
@@ -355,7 +344,8 @@ export default function ReservationCard({
                 : "bg-neutral-200",
             ].join(" ")}
           >
-            <ShieldCheck
+            <AdminIcon
+              name="shield"
               size={14}
               className={
                 reservation.paiement_reussi

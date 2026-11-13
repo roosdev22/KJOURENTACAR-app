@@ -23,6 +23,7 @@ from users.permissions import (
     IsAuthenticatedAndActive,
     IsNotForcedPasswordChange,
     IsAdmin,
+    IsAgent,
     IsSuperAdmin,
     CanCreateUser,
     CanChangeRole,
@@ -36,6 +37,7 @@ from users.serializers import (
     AdminCreateUserSerializer,
     AgentCreateClientSerializer,
     LoginSerializer,
+    AgentProfileSerializer,
     ChangePasswordSerializer,
     ClientProfileSerializer,
     RoleChangeSerializer,
@@ -114,7 +116,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if self.action == "me":
             if self.request.method == "PATCH":
+                if self.request.user.role == RoleChoices.AGENT:
+                    return AgentProfileSerializer
+
                 return ClientProfileSerializer
+
             return UserDetailedSerializer
 
         if self.action in ["retrieve", "eligibility"]:
@@ -261,6 +267,17 @@ class UserViewSet(viewsets.ModelViewSet):
                     IsAuthenticatedAndActive(),
                     IsNotForcedPasswordChange(),
                     CanManageUsers(),
+                ]
+
+                            # ==========================================================
+            # LISTE DES CLIENTS POUR LE PERSONNEL AUTORISÉ
+            # ==========================================================
+
+            if self.action == "clients":
+                return [
+                    IsAuthenticatedAndActive(),
+                    IsNotForcedPasswordChange(),
+                    IsAgent(),
                 ]
 
             # ==========================================================
@@ -953,37 +970,78 @@ class UserViewSet(viewsets.ModelViewSet):
     # FORGOT PASSWORD
     # ========================================================
 
+    
     @action(detail=False, methods=["post"])
     def forgot_password(self, request):
         """
-        Génère un token de réinitialisation.
-        La réponse ne révèle jamais si l'adresse email existe.
+        Réinitialisation du mot de passe.
+
+        Vérifie que l'adresse email correspond à un compte
+        CLIENT actif et non supprimé.
         """
 
         serializer = ForgotPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        email = serializer.validated_data["email"]
+        email = serializer.validated_data["email"].strip().lower()
 
         user = User.objects.filter(
-            email=email,
+            email__iexact=email,
+            role=RoleChoices.CLIENT,
             deleted_at__isnull=True,
             is_active=True,
         ).first()
 
-        if user:
-            PasswordResetToken.create_token(user)
-            logger.info("Token de reset créé pour %s", user.email)
+        if not user:
+            return Response(
+                {
+                    "detail": (
+                        "Cette adresse e-mail ne correspond à aucun "
+                        "compte client actif. Vous n'êtes pas autorisé "
+                        "à réinitialiser le mot de passe de ce compte. "
+                        "Vérifiez l'adresse e-mail associée à votre compte."
+                    )
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        reset_token = PasswordResetToken.create_token(user)
+
+        try:
+            EmailService.send_reset_password_email(
+                user=user,
+                reset_token=reset_token,
+            )
+
+        except Exception:
+            reset_token.delete()
+
+            logger.exception(
+                "Échec de l'envoi du lien de réinitialisation "
+                "pour %s",
+                user.email,
+            )
+
+            return Response(
+                {
+                    "detail": (
+                        "Impossible d'envoyer le lien de réinitialisation. "
+                        "Veuillez réessayer ultérieurement."
+                    )
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
         return Response(
             {
                 "message": (
-                    "Si cette adresse existe, "
-                    "un lien de réinitialisation a été envoyé."
+                    "Votre adresse e-mail a été vérifiée. "
+                    "Un lien de réinitialisation a été envoyé "
+                    "à l'adresse associée à votre compte."
                 )
-            }
+            },
+            status=status.HTTP_200_OK,
         )
-
     # ========================================================
     # RESET PASSWORD
     # ========================================================

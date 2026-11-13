@@ -1,11 +1,4 @@
 import {
-  AlertCircle,
-  ArrowLeft,
-  CheckCircle2,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
-import {
   useCallback,
   useEffect,
   useMemo,
@@ -13,6 +6,7 @@ import {
   useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import AdminIcon from "../../components/admin/AdminIcon";
 
 import { useAuth } from "../../hooks/useAuth";
 
@@ -28,11 +22,11 @@ import type { Reservation } from "../../types/reservation";
 
 import ReservationHero from "../../components/reservation/ReservationHero";
 import ReservationDateSelector from "../../components/reservation/ReservationDateSelector";
+import ReservationCategoryFilter from "../../components/reservation/ReservationCategoryFilter";
 import ReservationVehicleGrid from "../../components/reservation/ReservationVehicleGrid";
 import ReservationNotes from "../../components/reservation/ReservationNotes";
 import ReservationSummary from "../../components/reservation/ReservationSummary";
 import ReservationSecurityInfo from "../../components/reservation/ReservationSecurityInfo";
-import ReservationHotVehicles from "../../components/reservation/ReservationHotVehicles";
 import ReservationSuccess from "../../components/reservation/ReservationSuccess";
 
 /* ============================================================
@@ -349,6 +343,7 @@ export default function ReservationPage() {
   ] = useState<VehicleCategory | "ALL">(
     "ALL"
   );
+  const [vehicleSearch, setVehicleSearch] = useState("");
 
   const [
     vehiclesLoading,
@@ -856,6 +851,7 @@ useEffect(() => {
 
       setSelectedVehicleId(null);
       setSelectedCategory("ALL");
+      setVehicleSearch("");
       setNotesClient("");
       setErrors({});
       setGlobalError("");
@@ -898,9 +894,10 @@ useEffect(() => {
             aria-live="polite"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
-              <Loader2
+              <AdminIcon
+                name="loader"
                 size={28}
-                className="animate-spin text-red-600"
+                className="animate-spin text-[#B4232F]"
               />
             </div>
 
@@ -939,7 +936,7 @@ useEffect(() => {
 
             <div className="px-7 py-9 text-center sm:px-10 sm:py-11">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
-                <ShieldCheck size={30} />
+                <AdminIcon name="shield" size={30} />
               </div>
 
               <p className="mt-6 text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
@@ -1030,6 +1027,31 @@ useEffect(() => {
         }
       />
 
+      <nav
+        aria-label="Étapes de réservation"
+        className="border-y border-[#E3E6E8] bg-white"
+      >
+        <ol className="mx-auto grid max-w-7xl grid-cols-3 px-4 sm:px-6 lg:px-8">
+          {[
+            { number: "01", label: "Dates", target: "#reservation-dates" },
+            { number: "02", label: "Véhicule", target: "#reservation-vehicles" },
+            { number: "03", label: "Récapitulatif", target: "#reservation-finalize" },
+          ].map((step) => (
+            <li key={step.number}>
+              <a
+                href={step.target}
+                className="flex min-h-14 items-center justify-center gap-2 border-b-2 border-transparent px-2 text-sm font-semibold text-[#64748B] transition hover:border-[#B4232F] hover:text-[#202327] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#B4232F] sm:justify-start sm:gap-3 sm:px-4"
+              >
+                <span className="font-mono text-xs font-bold text-[#B4232F]">
+                  {step.number}
+                </span>
+                <span>{step.label}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
       {/* ======================================================
           GLOBAL ERROR
       ====================================================== */}
@@ -1042,7 +1064,7 @@ useEffect(() => {
               className="flex items-start gap-3"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
-                <AlertCircle size={17} />
+                <AdminIcon name="alert" size={17} />
               </div>
 
               <div className="min-w-0">
@@ -1060,64 +1082,52 @@ useEffect(() => {
       )}
 
       {/* ======================================================
-          RECOMMENDED VEHICLES
-      ====================================================== */}
-
-      {!vehiclesLoading &&
-        vehicles.length > 0 && (
-          <ReservationHotVehicles
-            vehicles={vehicles}
-            selectedVehicleIds={
-              selectedVehicleId
-                ? [selectedVehicleId]
-                : []
-            }
-            onVehicleSelect={
-              handleVehicleSelect
-            }
-            disabled={isSubmitting}
-          />
-        )}
-
-      {/* ======================================================
           FORM
       ====================================================== */}
-
-      <div ref={reservationFormRef}>
+      <div ref={reservationFormRef} className="bg-[#F4F5F6]">
         {/* ----------------------------------------------------
             DATES
         ---------------------------------------------------- */}
 
-        <ReservationDateSelector
-          dateDebut={dates.dateDebut}
-          dateFin={dates.dateFin}
-          onDateDebutChange={
-            handleDateDebutChange
-          }
-          onDateFinChange={
-            handleDateFinChange
-          }
-          disabled={isSubmitting}
-        />
+        <div id="reservation-dates" className="scroll-mt-6">
+          <ReservationDateSelector
+            dateDebut={dates.dateDebut}
+            dateFin={dates.dateFin}
+            onDateDebutChange={handleDateDebutChange}
+            onDateFinChange={handleDateFinChange}
+            errorDateDebut={errors.date_debut}
+            errorDateFin={errors.date_fin}
+            disabled={isSubmitting}
+          />
+        </div>
 
         {/* ----------------------------------------------------
             VEHICLES
         ---------------------------------------------------- */}
 
-        <ReservationVehicleGrid
-          vehicles={vehicles}
-          selectedCategory={selectedCategory}
-          selectedVehicleIds={
-            selectedVehicleId
-              ? [selectedVehicleId]
-              : []
-          }
-          onVehicleSelect={
-            handleVehicleSelect
-          }
-          loading={vehiclesLoading}
-          disabled={isSubmitting}
-        />
+        <div id="reservation-vehicles" className="scroll-mt-6">
+          <ReservationCategoryFilter
+            vehicles={vehicles}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            disabled={isSubmitting || vehiclesLoading}
+          />
+
+          <ReservationVehicleGrid
+            vehicles={vehicles}
+            selectedCategory={selectedCategory}
+            selectedVehicleIds={selectedVehicle ? [selectedVehicle.id] : []}
+            onVehicleSelect={handleVehicleSelect}
+            searchQuery={vehicleSearch}
+            onSearchQueryChange={setVehicleSearch}
+            onResetFilters={() => {
+              setVehicleSearch("");
+              setSelectedCategory("ALL");
+            }}
+            loading={vehiclesLoading}
+            disabled={isSubmitting}
+          />
+        </div>
 
         {/* ----------------------------------------------------
             VEHICLE ERROR
@@ -1130,7 +1140,8 @@ useEffect(() => {
                 role="alert"
                 className="flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5 text-sm font-semibold text-red-700"
               >
-                <AlertCircle
+                <AdminIcon
+                  name="alert"
                   size={17}
                   className="shrink-0"
                 />
@@ -1147,7 +1158,7 @@ useEffect(() => {
             NOTES + SUMMARY
         ==================================================== */}
 
-        <section className="border-t border-neutral-100 bg-neutral-50">
+        <section id="reservation-finalize" className="scroll-mt-6 border-t border-neutral-100 bg-neutral-50">
           <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-14 lg:px-10">
             <div className="mb-8">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
@@ -1186,7 +1197,8 @@ useEffect(() => {
                       role="alert"
                       className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 px-3.5 py-3 text-xs font-semibold text-red-700"
                     >
-                      <AlertCircle
+                      <AdminIcon
+                        name="alert"
                         size={15}
                         className="shrink-0"
                       />
@@ -1231,9 +1243,7 @@ useEffect(() => {
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
-                        <AlertCircle
-                          size={16}
-                        />
+                        <AdminIcon name="alert" size={16} />
                       </div>
 
                       <div className="space-y-1.5">
@@ -1267,9 +1277,7 @@ useEffect(() => {
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
-                <CheckCircle2
-                  size={17}
-                />
+                <AdminIcon name="check-circle" size={17} />
               </div>
 
               <div>
@@ -1294,7 +1302,7 @@ useEffect(() => {
               }
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.12em] text-neutral-500 transition hover:text-red-600"
             >
-              <ArrowLeft size={14} />
+              <AdminIcon name="arrow-left" size={14} />
               Retour en haut
             </button>
           </div>

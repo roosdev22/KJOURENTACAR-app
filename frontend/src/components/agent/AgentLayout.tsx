@@ -10,19 +10,18 @@ export default function AgentLayout() {
   const displayName = useDisplayName();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F4F5F6] text-[#202327]">
       <div className="flex">
         <AgentSidebar />
 
-        <main className="flex-1 min-w-0">
+        <main className="min-w-0 flex-1 bg-[#F4F5F6]">
           <AgentHeader
             userName={displayName}
             search={search}
             onSearchChange={setSearch}
-            notificationCount={3}
           />
 
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[1700px] px-4 pb-8 pt-5 sm:px-6 lg:px-8">
             <Outlet />
           </div>
         </main>

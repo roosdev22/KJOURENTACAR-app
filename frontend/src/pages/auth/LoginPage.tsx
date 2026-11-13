@@ -15,21 +15,12 @@ import {
 } from "lucide-react";
 
 import { GoogleLogin } from "@react-oauth/google";
-import type { AxiosError } from "axios";
 
+import { getApiErrorMessage } from "../../utils/apiError";
 import { authService } from "../../api/services/authService";
 import { useAuth } from "../../hooks/useAuth";
 
-// ============================================================
-// TYPES
-// ============================================================
 
-type DjangoErrorData = {
-  email_verified?: boolean;
-  force_password_change?: boolean;
-  error?: string;
-  detail?: string;
-};
 
 type LoginLocationState = {
   from?: {
@@ -75,75 +66,7 @@ export default function LoginPage() {
   // GESTION DES ERREURS DJANGO
   // ==========================================================
 
-  function getDjangoErrorMessage(
-    error: AxiosError<DjangoErrorData>
-  ): string {
-    const data = error.response?.data;
-    const status = error.response?.status;
 
-    // --------------------------------------------------------
-    // PAS DE RÉPONSE SERVEUR
-    // --------------------------------------------------------
-
-    if (!error.response) {
-      return (
-        "Impossible de joindre le serveur. " +
-        "Vérifiez votre connexion."
-      );
-    }
-
-    // --------------------------------------------------------
-    // 401
-    // --------------------------------------------------------
-
-    if (status === 401) {
-      return "Email ou mot de passe incorrect.";
-    }
-
-    // --------------------------------------------------------
-    // 403
-    // --------------------------------------------------------
-
-    if (status === 403) {
-      if (data?.email_verified === false) {
-        return (
-          "Votre email n'est pas vérifié. " +
-          "Consultez votre boîte mail."
-        );
-      }
-
-      if (data?.force_password_change === true) {
-        return (
-          "Vous devez changer votre mot de passe " +
-          "avant de continuer."
-        );
-      }
-
-      if (data?.error) {
-        return data.error;
-      }
-
-      if (data?.detail) {
-        return data.detail;
-      }
-
-      return "Accès refusé.";
-    }
-
-    // --------------------------------------------------------
-    // ERREURS PERSONNALISÉES
-    // --------------------------------------------------------
-
-    if (data?.error) {
-      return data.error;
-    }
-
-    if (data?.detail) {
-      return data.detail;
-    }
-
-    return "Erreur de connexion. Veuillez réessayer.";
-  }
 
   // ==========================================================
   // CHANGEMENT DES CHAMPS
@@ -295,14 +218,14 @@ export default function LoginPage() {
       // ------------------------------------------------------
 
       redirectUser(user.role);
-    } catch (error) {
-      console.error(
-        "Erreur connexion Google :",
-        error
-      );
+    } catch (error: unknown) {
+      console.error("Erreur connexion Google :", error);
 
       setError(
-        "Impossible de se connecter avec Google."
+        getApiErrorMessage(
+          error,
+          "Impossible de se connecter avec Google."
+        )
       );
     } finally {
       setLoading(false);
@@ -420,16 +343,25 @@ export default function LoginPage() {
       // ------------------------------------------------------
 
       redirectUser(user.role);
-    } catch (err) {
+   
+    
+    } catch (err: unknown) {
+      console.error("Échec de la connexion.");
+
       setError(
-        getDjangoErrorMessage(
-          err as AxiosError<DjangoErrorData>
+        getApiErrorMessage(
+          err,
+          "Erreur de connexion. Veuillez vérifier vos identifiants."
         )
       );
     } finally {
       setLoading(false);
     }
   };
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   // ==========================================================
   // RENDER

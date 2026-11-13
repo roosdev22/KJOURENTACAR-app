@@ -1,13 +1,5 @@
 import type { FormEvent } from "react";
-import {
-  X,
-  Save,
-  UserRound,
-  Mail,
-  Phone,
-  Shield,
-  Loader2,
-} from "lucide-react";
+import AdminIcon from "../AdminIcon";
 
 import type {
   User,
@@ -184,7 +176,7 @@ export default function EditUserModal({
             "
             aria-label="Fermer"
           >
-            <X size={19} />
+            <AdminIcon name="x" size={19} />
           </button>
         </div>
 
@@ -272,7 +264,8 @@ export default function EditUserModal({
             </label>
 
             <div className="relative">
-              <UserRound
+              <AdminIcon
+                name="user-round"
                 size={17}
                 className="
                   absolute
@@ -334,7 +327,8 @@ export default function EditUserModal({
             </label>
 
             <div className="relative">
-              <UserRound
+              <AdminIcon
+                name="user-round"
                 size={17}
                 className="
                   absolute
@@ -396,7 +390,8 @@ export default function EditUserModal({
             </label>
 
             <div className="relative">
-              <Mail
+              <AdminIcon
+                name="mail"
                 size={17}
                 className="
                   absolute
@@ -458,7 +453,8 @@ export default function EditUserModal({
             </label>
 
             <div className="relative">
-              <Phone
+              <AdminIcon
+                name="phone"
                 size={17}
                 className="
                   absolute
@@ -519,7 +515,8 @@ export default function EditUserModal({
             </label>
 
             <div className="relative">
-              <Shield
+              <AdminIcon
+                name="shield"
                 size={17}
                 className="
                   pointer-events-none
@@ -633,7 +630,8 @@ export default function EditUserModal({
             >
               {editing ? (
                 <>
-                  <Loader2
+                  <AdminIcon
+                    name="loader"
                     size={17}
                     className="animate-spin"
                   />
@@ -642,7 +640,7 @@ export default function EditUserModal({
                 </>
               ) : (
                 <>
-                  <Save size={17} />
+                  <AdminIcon name="save" size={17} />
 
                   Enregistrer
                 </>

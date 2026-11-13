@@ -69,11 +69,18 @@ def creer_reservation(
     # 3. Verrouiller les véhicules
     # ============================================================
 
+    # vehicules_verrouilles = list(
+    #     Vehicle.objects
+    #     .select_for_update()
+    #     .filter(id__in=vehicule_ids)
+    # )
+
     vehicules_verrouilles = list(
         Vehicle.objects
         .select_for_update()
         .filter(id__in=vehicule_ids)
-    )
+        .order_by("pk")
+        )
 
     # ============================================================
     # 4. Vérifier que tous les véhicules existent

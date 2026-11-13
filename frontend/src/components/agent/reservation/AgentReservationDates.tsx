@@ -1,3 +1,4 @@
+
 import { CalendarDays } from "lucide-react";
 
 interface AgentReservationDatesProps {
@@ -7,13 +8,35 @@ interface AgentReservationDatesProps {
   onDateFinChange: (value: string) => void;
 }
 
+function getLocalDate(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getNextDate(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + 1));
+
+  return date.toISOString().slice(0, 10);
+}
+
 export default function AgentReservationDates({
   dateDebut,
   dateFin,
   onDateDebutChange,
   onDateFinChange,
 }: AgentReservationDatesProps) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getLocalDate();
+  const minDateFin = dateDebut
+    ? getNextDate(dateDebut)
+    : getNextDate(today);
+
+  const datesInvalides =
+    Boolean(dateDebut && dateFin) && dateFin <= dateDebut;
 
   return (
     <section>
@@ -42,19 +65,19 @@ export default function AgentReservationDates({
         <DateField
           label="Date de fin"
           value={dateFin}
-          min={dateDebut || today}
+          min={minDateFin}
           onChange={onDateFinChange}
         />
       </div>
 
-      {dateDebut &&
-        dateFin &&
-        dateFin < dateDebut && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            La date de fin doit être postérieure ou égale à la date
-            de début.
-          </div>
-        )}
+      {datesInvalides && (
+        <div
+          role="alert"
+          className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          La date de fin doit être strictement postérieure à la date de début.
+        </div>
+      )}
 
       <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -62,8 +85,8 @@ export default function AgentReservationDates({
         </p>
 
         <p className="mt-1 text-sm leading-6 text-slate-600">
-          Le nombre de jours et le montant de la réservation sont
-          calculés par le serveur.
+          Le nombre de jours et le montant de la réservation sont calculés par
+          le serveur.
         </p>
       </div>
     </section>

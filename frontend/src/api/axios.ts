@@ -128,13 +128,18 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Pas un 401 ou requête déjà retentée
-    if (
-      error.response?.status !== 401 ||
-      originalRequest?._retry
-    ) {
-      return Promise.reject(error);
-    }
+    // Pas un 401, requête déjà retentée ou connexion initiale
+const isAuthenticationRequest =
+  originalRequest?.url?.includes("/users/login/") ||
+  originalRequest?.url?.includes("/users/google_login/");
 
+if (
+  error.response?.status !== 401 ||
+  originalRequest?._retry ||
+  isAuthenticationRequest
+) {
+  return Promise.reject(error);
+}
 
     // ========================================================
     // EXCLUSION DE /users/me/

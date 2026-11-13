@@ -1,3 +1,62 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/Inter-latin-variable.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/fonts/Manrope-latin-variable.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* RGB channels let Tailwind generate alpha variants from these tokens. */
+  --kjou-red: 180 35 47;
+  --kjou-red-hover: 148 28 39;
+  --kjou-carbon: 23 25 28;
+  --kjou-white: 255 255 255;
+  --kjou-mist: 244 245 246;
+  --kjou-border: 227 230 232;
+  --kjou-text: 32 35 39;
+  --kjou-muted: 100 116 139;
+  --kjou-success: 22 132 91;
+  --kjou-warning: 183 121 31;
+  --kjou-danger: var(--kjou-red);
+
+  --kjou-surface: var(--kjou-white);
+  --kjou-surface-muted: var(--kjou-mist);
+  --kjou-surface-inverse: var(--kjou-carbon);
+
+  --kjou-font-display: "Manrope", system-ui, sans-serif;
+  --kjou-font-body: "Inter", system-ui, sans-serif;
+  --kjou-type-page: 2rem;
+  --kjou-line-page: 2.4rem;
+  --kjou-type-page-compact: 1.5rem;
+  --kjou-line-page-compact: 1.875rem;
+  --kjou-type-section: 1.25rem;
+  --kjou-line-section: 1.75rem;
+  --kjou-type-body: 1rem;
+  --kjou-line-body: 1.5rem;
+  --kjou-type-meta: 0.8125rem;
+  --kjou-line-meta: 1.25rem;
+
+  --kjou-space-page-sm: 1.25rem;
+  --kjou-space-page: 1.5rem;
+  --kjou-space-section: 1.5rem;
+  --kjou-radius-card: 0.875rem;
+  --kjou-radius-control: 0.625rem;
+  --kjou-border-width: 1px;
+  --kjou-focus-ring-width: 2px;
+  --kjou-focus-ring-offset: 2px;
+}

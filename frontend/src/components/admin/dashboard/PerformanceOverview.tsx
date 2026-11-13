@@ -1,269 +1,164 @@
-import {
-  TrendingUp,
-  Wallet,
-  CalendarCheck,
-  ArrowUpRight,
-} from "lucide-react";
+import type { DashboardPerformance } from "../../../api/services/adminDashboardService";
+import AdminIcon from "../AdminIcon";
 
-export default function PerformanceOverview() {
+interface PerformanceOverviewProps {
+  performance: DashboardPerformance;
+  loading?: boolean;
+}
+
+function formatHTG(value: string | number): string {
+  const amount = Number(value);
+
+  if (!Number.isFinite(amount)) {
+    return "0 HTG";
+  }
+
+  return `${new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 2,
+  }).format(amount)} HTG`;
+}
+
+export default function PerformanceOverview({
+  performance,
+  loading = false,
+}: PerformanceOverviewProps) {
+  const chart = performance.chart ?? [];
+
+  const maxRevenue = Math.max(
+    ...chart.map((item) => Number(item.revenue_htg) || 0),
+    1,
+  );
+
   return (
-    <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-5">
-
-      {/* En-tête */}
-      <div className="flex items-center justify-between mb-5">
+    <section className="rounded-kjou-card border border-kjou-border bg-white p-4 sm:p-5">
+      <div className="mb-5 flex items-center justify-between">
         <div>
-          <h2 className="text-sm sm:text-base font-semibold text-gray-900">
+          <h2 className="font-kjou-display text-sm font-bold text-kjou-text sm:text-base">
             Performance
           </h2>
 
-          <p className="mt-1 text-xs text-gray-500">
-            Activité de location
+          <p className="mt-1 text-xs text-kjou-muted">
+            Activité de location sur la période sélectionnée
           </p>
         </div>
 
-        <div
-          className="
-            w-9
-            h-9
-            rounded-lg
-            bg-gray-100
-            text-gray-600
-            flex
-            items-center
-            justify-center
-          "
-        >
-          <TrendingUp size={17} />
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-kjou-mist text-kjou-carbon">
+          <AdminIcon name="trend-up" size={17} />
         </div>
       </div>
 
-      {/* Indicateurs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-        {/* Revenus */}
-        <div
-          className="
-            rounded-lg
-            border border-gray-200
-            bg-white
-            p-4
-            transition-all
-            duration-200
-            hover:border-gray-300
-            hover:shadow-sm
-          "
-        >
-          <div className="flex items-center justify-between">
-
-            <div className="flex items-center gap-2">
-              <div
-                className="
-                  w-8
-                  h-8
-                  rounded-lg
-                  bg-gray-100
-                  text-gray-600
-                  flex
-                  items-center
-                  justify-center
-                "
-              >
-                <Wallet size={15} />
-              </div>
-
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
-                Revenus
-              </span>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="rounded-lg border border-kjou-border p-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-kjou-mist text-kjou-carbon">
+              <AdminIcon name="wallet" size={15} />
             </div>
 
-            <ArrowUpRight
-              size={15}
-              className="text-green-600"
-            />
+            <span className="text-xs font-medium text-kjou-muted sm:text-sm">
+              Revenus encaissés nets
+            </span>
           </div>
 
-          <p className="mt-3 text-xl sm:text-2xl font-bold text-gray-900">
-            125 400{" "}
-            <span className="text-xs sm:text-sm font-medium text-gray-500">
-              HTG
-            </span>
+          <p className="mt-3 break-words font-kjou-display text-xl font-bold text-kjou-text sm:text-2xl">
+            {loading ? "Chargement…" : formatHTG(performance.revenue_htg)}
           </p>
 
-          <div className="mt-2 flex items-center gap-2">
-            <span
-              className="
-                inline-flex
-                items-center
-                px-1.5
-                py-0.5
-                rounded-md
-                bg-green-50
-                text-green-700
-                text-[11px]
-                font-semibold
-              "
-            >
-              +12,5%
-            </span>
-
-            <span className="text-[11px] text-gray-400">
-              vs mois dernier
-            </span>
-          </div>
+          <p className="mt-2 text-[11px] text-kjou-muted">
+            Après prise en compte des remboursements
+          </p>
         </div>
 
-        {/* Locations */}
-        <div
-          className="
-            rounded-lg
-            border border-gray-200
-            bg-white
-            p-4
-            transition-all
-            duration-200
-            hover:border-gray-300
-            hover:shadow-sm
-          "
-        >
-          <div className="flex items-center justify-between">
-
-            <div className="flex items-center gap-2">
-              <div
-                className="
-                  w-8
-                  h-8
-                  rounded-lg
-                  bg-gray-100
-                  text-gray-600
-                  flex
-                  items-center
-                  justify-center
-                "
-              >
-                <CalendarCheck size={15} />
-              </div>
-
-              <span className="text-xs sm:text-sm font-medium text-gray-600">
-                Locations
-              </span>
+        <div className="rounded-lg border border-kjou-border p-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-kjou-mist text-kjou-carbon">
+              <AdminIcon name="calendar-check" size={15} />
             </div>
 
-            <ArrowUpRight
-              size={15}
-              className="text-green-600"
-            />
+            <span className="text-xs font-medium text-kjou-muted sm:text-sm">
+              Réservations créées
+            </span>
           </div>
 
-          <p className="mt-3 text-xl sm:text-2xl font-bold text-gray-900">
-            42
+          <p className="mt-3 font-kjou-display text-xl font-bold text-kjou-text sm:text-2xl">
+            {loading ? "…" : performance.reservations_count}
           </p>
 
-          <div className="mt-2 flex items-center gap-2">
-            <span
-              className="
-                inline-flex
-                items-center
-                px-1.5
-                py-0.5
-                rounded-md
-                bg-green-50
-                text-green-700
-                text-[11px]
-                font-semibold
-              "
-            >
-              +8,2%
-            </span>
-
-            <span className="text-[11px] text-gray-400">
-              vs mois dernier
-            </span>
-          </div>
+          <p className="mt-2 text-[11px] text-kjou-muted">
+            Sur la période sélectionnée
+          </p>
         </div>
-
       </div>
 
-      {/* Graphique */}
       <div className="mt-5">
+        <div className="mb-3">
+          <h3 className="text-xs font-semibold text-kjou-text sm:text-sm">
+            Évolution des revenus
+          </h3>
 
-        <div className="flex items-center justify-between mb-3">
-
-          <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-800">
-              Aperçu des performances
-            </h3>
-
-            <p className="mt-0.5 text-[11px] text-gray-400">
-              Évolution de votre activité
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1">
-
-            <button
-              type="button"
-              className="
-                px-2.5
-                py-1
-                rounded-md
-                text-[11px]
-                font-medium
-                text-gray-500
-                hover:bg-gray-100
-                transition
-              "
-            >
-              7 jours
-            </button>
-
-            <button
-              type="button"
-              className="
-                px-2.5
-                py-1
-                rounded-md
-                text-[11px]
-                font-medium
-                bg-red-700
-                text-white
-                hover:bg-red-800
-                transition
-              "
-            >
-              30 jours
-            </button>
-
-          </div>
+          <p className="mt-1 text-[11px] text-kjou-muted">
+            Revenus nets en HTG par jour ou par mois
+          </p>
         </div>
 
-        {/* Zone graphique */}
-        <div
-          className="
-            h-36
-            rounded-lg
-            border border-gray-200
-            bg-gray-50
-            flex
-            items-center
-            justify-center
-          "
-        >
-          <div className="text-center">
-            <TrendingUp
-              size={22}
-              className="mx-auto mb-2 text-gray-300"
-            />
-
-            <p className="text-xs font-medium text-gray-500">
-              Graphique des performances
-            </p>
-
-            <p className="mt-1 text-[10px] text-gray-400">
-              Les données seront affichées ici
+        {loading ? (
+          <div className="flex h-40 items-center justify-center rounded-lg border border-kjou-border bg-kjou-mist">
+            <p className="text-xs text-kjou-muted">
+              Chargement des performances…
             </p>
           </div>
-        </div>
+        ) : chart.length === 0 ? (
+          <div className="flex h-40 items-center justify-center rounded-lg border border-kjou-border bg-kjou-mist">
+            <p className="text-xs text-kjou-muted">
+              Aucune donnée disponible pour cette période.
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-kjou-border bg-kjou-mist p-3">
+            <div className="flex h-36 items-end gap-1.5 sm:gap-2">
+              {chart.map((item) => {
+                const revenue = Number(item.revenue_htg) || 0;
+                const height =
+                  revenue > 0
+                    ? Math.max((revenue / maxRevenue) * 100, 3)
+                    : 0;
 
+                return (
+                  <div
+                    key={item.date}
+                    className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end"
+                    title={`${item.label} — ${formatHTG(revenue)} — ${item.reservations} réservation(s)`}
+                  >
+                    <div className="mb-1 hidden text-[9px] text-kjou-muted group-hover:block">
+                      {revenue > 0 ? formatHTG(revenue) : ""}
+                    </div>
+
+                    <div className="flex h-full w-full items-end justify-center">
+                      <div
+                        className="w-full max-w-8 rounded-t-sm bg-kjou-red transition-colors group-hover:bg-kjou-red-hover"
+                        style={{ height: `${height}%` }}
+                      />
+                    </div>
+
+                    <span className="mt-2 w-full truncate text-center text-[9px] text-kjou-muted">
+                      {item.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-3 flex items-center justify-between border-t border-kjou-border pt-3 text-[10px] text-kjou-muted">
+              <span>{chart.length} période(s)</span>
+              <span>
+                {chart.reduce(
+                  (total, item) => total + item.reservations,
+                  0,
+                )}{" "}
+                réservation(s) créées
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

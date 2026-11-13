@@ -7,7 +7,6 @@ import {
   PlusCircle,
   KeyRound,
   CarFront,
-  Clock3,
   CreditCard,
   FileText,
   Users,
@@ -85,11 +84,7 @@ const menuSections: MenuSection[] = [
         path: "/agent/vehicles",
         icon: CarFront,
       },
-      {
-        label: "Disponibilités",
-        path: "/agent/availability",
-        icon: Clock3,
-      },
+    
     ],
   },
   {
@@ -122,26 +117,23 @@ const menuSections: MenuSection[] = [
 export default function AgentSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  
+
   const { logout } = useAuth();
   const sidebarWidth = collapsed ? "lg:w-20" : "lg:w-64";
 
   return (
     <>
-      {/* ============================================================
-          MOBILE TOP BAR
-      ============================================================ */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-white border-b border-black/10 flex items-center justify-between px-4">
+      <div className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-white/10 bg-[#17191C] px-4 lg:hidden">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-red-700 text-white flex items-center justify-center font-bold shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#B4232F] text-sm font-black text-white shadow-sm">
             K
           </div>
 
           <div>
-            <p className="text-sm font-bold text-black tracking-tight">
+            <p className="text-sm font-bold tracking-tight text-white">
               K-JOU RENT A CAR
             </p>
-            <p className="text-[10px] uppercase tracking-wider text-black/40 font-semibold">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">
               Agent de location
             </p>
           </div>
@@ -150,74 +142,42 @@ export default function AgentSidebar() {
         <button
           type="button"
           onClick={() => setMobileOpen((value) => !value)}
-          className="w-10 h-10 rounded-lg border border-black/10 flex items-center justify-center text-black/70 hover:bg-black/5 transition"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 transition hover:bg-white/10"
           aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
-          {mobileOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
-      {/* ============================================================
-          MOBILE OVERLAY
-      ============================================================ */}
       {mobileOpen && (
         <button
           type="button"
           aria-label="Fermer le menu"
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+          className="fixed inset-0 z-40 bg-[#17191C]/55 backdrop-blur-[2px] lg:hidden"
         />
       )}
 
-      {/* ============================================================
-          SIDEBAR
-      ============================================================ */}
       <aside
         className={`
-          fixed lg:sticky
-          top-0 left-0
-          z-50 lg:z-30
-          h-screen
-          bg-white
-          border-r border-black/10
-          transition-all duration-300
+          fixed left-0 top-0 z-50 h-screen border-r border-white/10 bg-[#17191C] text-white transition-all duration-300 lg:sticky
           ${sidebarWidth}
-          ${
-            mobileOpen
-              ? "translate-x-0 w-64"
-              : "-translate-x-full lg:translate-x-0"
-          }
+          ${mobileOpen ? "w-64 translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        <div className="h-full flex flex-col">
-          {/* ========================================================
-              LOGO
-          ======================================================== */}
-          <div
-            className={`
-              h-20
-              px-4
-              flex items-center
-              border-b border-black/5
-              ${collapsed ? "lg:justify-center" : ""}
-            `}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="shrink-0 w-9 h-9 rounded-lg bg-red-700 text-white flex items-center justify-center font-bold shadow-sm">
+        <div className="flex h-full flex-col">
+          <div className={`flex h-20 items-center border-b border-white/10 px-4 ${collapsed ? "lg:justify-center" : ""}`}>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#B4232F] text-sm font-black text-white shadow-sm">
                 K
               </div>
 
               {!collapsed && (
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-black tracking-tight truncate">
+                  <p className="truncate text-sm font-bold tracking-tight text-white">
                     K-JOU RENT A CAR
                   </p>
-
-                  <p className="text-[10px] uppercase tracking-wider text-black/40 font-semibold">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">
                     Agent de location
                   </p>
                 </div>
@@ -225,14 +185,11 @@ export default function AgentSidebar() {
             </div>
           </div>
 
-          {/* ========================================================
-              NAVIGATION
-          ======================================================== */}
-          <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+          <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
             {menuSections.map((section) => (
               <div key={section.title}>
                 {!collapsed && (
-                  <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-black/40">
+                  <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
                     {section.title}
                   </p>
                 )}
@@ -249,58 +206,26 @@ export default function AgentSidebar() {
                         onClick={() => setMobileOpen(false)}
                         title={collapsed ? item.label : undefined}
                         className={({ isActive }) =>
-                          `
-                          group
-                          flex items-center
-                          ${collapsed ? "lg:justify-center" : ""}
-                          gap-3
-                          px-3
-                          py-2.5
-                          rounded-lg
-                          text-sm
-                          transition-all duration-200
-                          ${
+                          `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${collapsed ? "lg:justify-center" : ""} ${
                             isActive
-                              ? "bg-red-50 text-red-700 font-semibold"
-                              : "text-black/65 hover:bg-black/[0.04] hover:text-black"
-                          }
-                        `
+                              ? "bg-[#B4232F] text-white shadow-[0_10px_24px_rgba(180,35,47,0.25)]"
+                              : "text-white/70 hover:bg-white/5 hover:text-white"
+                          }`
                         }
                       >
                         {({ isActive }) => (
                           <>
-                            <Icon
-                              className={`
-                                shrink-0
-                                w-[18px]
-                                h-[18px]
-                                ${
-                                  isActive
-                                    ? "text-red-700"
-                                    : "text-black/50 group-hover:text-black/70"
-                                }
-                              `}
-                            />
+                            <Icon className={`h-[18px] w-[18px] shrink-0 ${isActive ? "text-white" : "text-white/60 group-hover:text-white"}`} />
 
                             {!collapsed && (
                               <>
-                                <span className="flex-1 truncate">
-                                  {item.label}
-                                </span>
+                                <span className="flex-1 truncate">{item.label}</span>
 
                                 {item.badge !== undefined && (
                                   <span
-                                    className={`
-                                      min-w-5 h-5 px-1.5
-                                      rounded-full
-                                      flex items-center justify-center
-                                      text-[10px] font-bold
-                                      ${
-                                        isActive
-                                          ? "bg-red-700 text-white"
-                                          : "bg-red-50 text-red-700"
-                                      }
-                                    `}
+                                    className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${
+                                      isActive ? "bg-white text-[#B4232F]" : "bg-[#B4232F]/20 text-white"
+                                    }`}
                                   >
                                     {item.badge}
                                   </span>
@@ -317,78 +242,32 @@ export default function AgentSidebar() {
             ))}
           </nav>
 
-          {/* ========================================================
-              DESKTOP COLLAPSE
-          ======================================================== */}
-          <div className="hidden lg:block px-3 pb-3">
+          <div className="hidden px-3 pb-3 lg:block">
             <button
               type="button"
               onClick={() => setCollapsed((value) => !value)}
-              className="
-                w-full
-                flex items-center justify-center
-                gap-2
-                py-2.5
-                rounded-lg
-                border border-black/10
-                text-black/50
-                hover:text-black
-                hover:bg-black/[0.03]
-                transition
-              "
-              aria-label={
-                collapsed
-                  ? "Développer la barre latérale"
-                  : "Réduire la barre latérale"
-              }
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
+              aria-label={collapsed ? "Développer la barre latérale" : "Réduire la barre latérale"}
             >
-              {collapsed ? (
-                <ChevronRight className="w-4 h-4" />
-              ) : (
-                <>
-                  <ChevronLeft className="w-4 h-4" />
-                  <span className="text-xs font-medium">Réduire</span>
-                </>
-              )}
+              {collapsed ? <ChevronRight className="h-4 w-4" /> : <><ChevronLeft className="h-4 w-4" /><span>Réduire</span></>}
             </button>
           </div>
 
-          {/* ========================================================
-              LOGOUT
-          ======================================================== */}
-          <div className="p-3 border-t border-black/5">
+          <div className="border-t border-white/10 p-3">
             <button
-              type="button"   onClick={() => void logout()}
-              className={`
-                group
-                w-full
-                flex items-center
-                ${collapsed ? "lg:justify-center" : ""}
-                gap-3
-                px-3
-                py-2.5
-                rounded-lg
-                text-sm
-                text-black/60
-                hover:bg-red-50
-                hover:text-red-700
-                transition
-              `}
+              type="button"
+              onClick={() => void logout()}
+              className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/70 transition hover:bg-[#B4232F]/10 hover:text-white ${collapsed ? "lg:justify-center" : ""}`}
               title={collapsed ? "Déconnexion" : undefined}
             >
-              <LogOut className="w-[18px] h-[18px] shrink-0" />
+              <LogOut className="h-[18px] w-[18px] shrink-0" />
 
-              {!collapsed && (
-                <span className="font-medium">Déconnexion</span>
-              )}
+              {!collapsed && <span className="font-medium">Déconnexion</span>}
             </button>
           </div>
         </div>
       </aside>
 
-      {/* ============================================================
-          MOBILE SPACER
-      ============================================================ */}
       <div className="lg:hidden h-16" />
     </>
   );

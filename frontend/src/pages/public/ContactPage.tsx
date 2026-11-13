@@ -46,7 +46,7 @@ export default function ContactPage() {
       setTimeout(() => {
         setSuccess(false);
       }, 5000);
-    } catch (err) {
+    } catch {
       setError("Erreur lors de l'envoi. Veuillez réessayer.");
     } finally {
       setLoading(false);

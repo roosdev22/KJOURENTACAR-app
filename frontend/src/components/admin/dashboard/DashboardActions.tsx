@@ -1,213 +1,75 @@
-import {
-  CalendarPlus,
-  CarFront,
-  CreditCard,
-  UserPlus,
-  ArrowUpRight,
-} from "lucide-react";
+
+import { useNavigate } from "react-router-dom";
+import AdminIcon from "../AdminIcon";
 
 const actions = [
   {
-    label: "Nouvelle réservation",
-    description: "Créer une réservation",
-    icon: CalendarPlus,
-    color: "blue",
+    label: "Réservations",
+    description: "Consulter les dossiers",
+    icon: "reservation",
+    path: "/admin/reservations",
   },
   {
     label: "Ajouter un véhicule",
     description: "Ajouter à la flotte",
-    icon: CarFront,
-    color: "orange",
+    icon: "vehicle",
+    path: "/admin/vehicles",
   },
   {
     label: "Enregistrer un paiement",
     description: "Ajouter un paiement",
-    icon: CreditCard,
-    color: "green",
+    icon: "payment",
+    path: "/admin/payments",
   },
   {
     label: "Nouvel utilisateur",
     description: "Créer un utilisateur",
-    icon: UserPlus,
-    color: "red",
+    icon: "users",
+    path: "/admin/users",
   },
 ] as const;
 
-const colorStyles = {
-  blue: {
-    icon: "bg-blue-50 text-blue-600",
-    hover: "group-hover:border-blue-200",
-    arrow: "group-hover:bg-blue-50 group-hover:text-blue-600",
-  },
-
-  orange: {
-    icon: "bg-orange-50 text-orange-600",
-    hover: "group-hover:border-orange-200",
-    arrow: "group-hover:bg-orange-50 group-hover:text-orange-600",
-  },
-
-  green: {
-    icon: "bg-emerald-50 text-emerald-600",
-    hover: "group-hover:border-emerald-200",
-    arrow: "group-hover:bg-emerald-50 group-hover:text-emerald-600",
-  },
-
-  red: {
-    icon: "bg-red-50 text-red-600",
-    hover: "group-hover:border-red-200",
-    arrow: "group-hover:bg-red-50 group-hover:text-red-600",
-  },
-};
-
 export default function DashboardActions() {
-  return (
-    <section className="space-y-4">
+  const navigate = useNavigate();
 
-      {/* En-tête */}
-      <div>
-        <h2 className="text-sm sm:text-base font-bold text-gray-900">
+  return (
+    <section className="space-y-3">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <h2 className="font-kjou-display text-base font-bold text-kjou-text">
           Actions rapides
         </h2>
-
-        <p className="mt-1 text-xs sm:text-sm text-gray-400">
-          Accédez rapidement aux opérations principales
+        <p className="text-xs text-kjou-muted">
+          Accès direct aux opérations d’administration
         </p>
       </div>
 
-      {/* Actions */}
-      <div
-        className="
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          lg:grid-cols-4
-          gap-3
-        "
-      >
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
         {actions.map((action) => {
-          const Icon = action.icon;
-          const styles = colorStyles[action.color];
-
           return (
             <button
               key={action.label}
               type="button"
-              className={`
-                group
-                relative
-                flex
-                items-center
-                gap-3
-
-                min-h-[78px]
-                p-3.5
-
-                rounded-xl
-
-                bg-white
-                border
-                border-gray-200
-
-                text-left
-
-                shadow-sm
-
-                transition-all
-                duration-200
-
-                hover:-translate-y-0.5
-                hover:shadow-md
-
-                ${styles.hover}
-
-                focus:outline-none
-                focus:ring-2
-                focus:ring-red-500/30
-              `}
+              onClick={() => navigate(action.path)}
+              aria-label={action.label}
+              className="group flex min-h-16 items-center gap-3 rounded-lg border border-kjou-border bg-white px-3.5 py-3 text-left transition-colors hover:border-kjou-red/40 hover:bg-kjou-mist/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kjou-red focus-visible:ring-offset-2"
             >
-
-              {/* Icône */}
-              <div
-                className={`
-                  shrink-0
-                  flex
-                  items-center
-                  justify-center
-
-                  w-10
-                  h-10
-
-                  rounded-lg
-
-                  ${styles.icon}
-
-                  transition-transform
-                  duration-200
-
-                  group-hover:scale-105
-                `}
-              >
-                <Icon
-                  size={18}
-                  strokeWidth={2}
-                />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-kjou-mist text-kjou-carbon transition-colors group-hover:bg-kjou-red/10 group-hover:text-kjou-red">
+                <AdminIcon name={action.icon} size={18} />
               </div>
 
-              {/* Texte */}
               <div className="min-w-0 flex-1">
-
-                <p
-                  className="
-                    text-sm
-                    font-semibold
-                    text-gray-800
-                    truncate
-                  "
-                >
+                <p className="truncate text-sm font-semibold text-kjou-text">
                   {action.label}
                 </p>
-
-                <p
-                  className="
-                    mt-0.5
-                    text-xs
-                    text-gray-400
-                    truncate
-                  "
-                >
+                <p className="mt-0.5 truncate text-xs text-kjou-muted">
                   {action.description}
                 </p>
-
               </div>
-
-              {/* Flèche */}
-              <div
-                className={`
-                  shrink-0
-
-                  flex
-                  items-center
-                  justify-center
-
-                  w-7
-                  h-7
-
-                  rounded-full
-
-                  bg-gray-50
-                  text-gray-400
-
-                  transition-all
-                  duration-200
-
-                  group-hover:translate-x-0.5
-
-                  ${styles.arrow}
-                `}
-              >
-                <ArrowUpRight size={14} />
-              </div>
-
+              <AdminIcon
+                name="arrow-up-right"
+                size={15}
+                className="shrink-0 text-kjou-muted transition-colors group-hover:text-kjou-red"
+              />
             </button>
           );
         })}

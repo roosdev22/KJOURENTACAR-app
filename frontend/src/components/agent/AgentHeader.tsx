@@ -1,16 +1,14 @@
 import {
   Search,
-  Bell,
   ChevronDown,
   User,
 } from "lucide-react";
-
+import NotificationBell from "../notifications/NotificationBell";
 interface AgentHeaderProps {
   userName: string;
   userRole?: string;
   search: string;
   onSearchChange: (value: string) => void;
-  notificationCount?: number;
 }
 
 export default function AgentHeader({
@@ -18,210 +16,73 @@ export default function AgentHeader({
   userRole = "Agent de location",
   search,
   onSearchChange,
-  notificationCount = 0,
 }: AgentHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 bg-white border-b border-black/10">
-      <div className="px-4 sm:px-6 lg:px-8 py-4">
+    <header className="sticky top-0 z-20 border-b border-[#E3E6E8] bg-white/90 backdrop-blur-sm">
+      <div className="px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
-          {/* ========================================================
-              WELCOME
-          ======================================================== */}
-          <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs uppercase tracking-wider font-bold text-black/40">
-              BIENVENUE,
-            </p>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#B4232F] text-sm font-black text-white shadow-sm">
+              K
+            </div>
 
-            <h1 className="mt-0.5 text-base sm:text-lg font-bold text-black truncate">
-              {userName}
-            </h1>
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#64748B]">
+                Espace agent
+              </p>
+              <h1 className="mt-0.5 truncate text-base font-bold text-[#202327] sm:text-lg">
+                {userName}
+              </h1>
+            </div>
           </div>
 
-          {/* ========================================================
-              DESKTOP SEARCH
-          ======================================================== */}
-          <div className="hidden md:flex flex-1 justify-center px-4">
+          <div className="hidden flex-1 justify-center px-4 md:flex">
             <div className="relative w-full max-w-xl">
-              <Search
-                className="
-                  absolute
-                  left-3
-                  top-1/2
-                  -translate-y-1/2
-                  w-4
-                  h-4
-                  text-black/35
-                "
-              />
-
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
               <input
                 type="text"
                 value={search}
-                onChange={(event) =>
-                  onSearchChange(event.target.value)
-                }
+                onChange={(event) => onSearchChange(event.target.value)}
                 placeholder="Rechercher une réservation, un client..."
-                className="
-                  w-full
-                  h-10
-                  pl-9
-                  pr-4
-                  rounded-lg
-                  bg-black/[0.02]
-                  border border-black/10
-                  text-sm
-                  text-black
-                  placeholder:text-black/35
-                  outline-none
-                  transition
-                  focus:bg-white
-                  focus:border-red-300
-                  focus:ring-2
-                  focus:ring-red-100
-                "
+                className="h-11 w-full rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] pl-10 pr-4 text-sm text-[#202327] placeholder:text-[#64748B] outline-none transition focus:border-[#B4232F] focus:bg-white focus:ring-2 focus:ring-[#B4232F]/10"
               />
             </div>
           </div>
 
-          {/* ========================================================
-              RIGHT ACTIONS
-          ======================================================== */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Notifications */}
+            <NotificationBell />
+
             <button
               type="button"
-              className="
-                relative
-                w-10
-                h-10
-                rounded-lg
-                flex
-                items-center
-                justify-center
-                text-black/60
-                hover:bg-black/[0.04]
-                hover:text-black
-                transition
-              "
-              aria-label="Notifications"
+              className="flex items-center gap-2 rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] px-2 py-1.5 text-left transition hover:border-[#B4232F]/30 hover:bg-white sm:gap-3 sm:px-3"
             >
-              <Bell className="w-5 h-5" />
-
-              {notificationCount > 0 && (
-                <span
-                  className="
-                    absolute
-                    -top-0.5
-                    -right-0.5
-                    min-w-4
-                    h-4
-                    px-1
-                    rounded-full
-                    bg-red-700
-                    text-white
-                    text-[9px]
-                    font-bold
-                    flex
-                    items-center
-                    justify-center
-                    border-2
-                    border-white
-                  "
-                >
-                  {notificationCount > 99 ? "99+" : notificationCount}
-                </span>
-              )}
-            </button>
-
-            {/* Profile */}
-            <button
-              type="button"
-              className="
-                flex
-                items-center
-                gap-2
-                sm:gap-3
-                px-2
-                sm:px-3
-                py-1.5
-                rounded-lg
-                hover:bg-black/[0.03]
-                transition
-              "
-            >
-              <div
-                className="
-                  w-9
-                  h-9
-                  rounded-full
-                  bg-red-50
-                  text-red-700
-                  flex
-                  items-center
-                  justify-center
-                  shrink-0
-                "
-              >
-                <User className="w-4 h-4" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#B4232F]/10 text-[#B4232F]">
+                <User className="h-4 w-4" />
               </div>
 
-              <div className="hidden sm:block text-left min-w-0">
-                <p className="text-sm font-semibold text-black truncate max-w-32">
+              <div className="hidden min-w-0 sm:block">
+                <p className="max-w-32 truncate text-sm font-semibold text-[#202327]">
                   {userName}
                 </p>
-
-                <p className="text-[11px] text-black/40 truncate max-w-32">
+                <p className="max-w-32 truncate text-[11px] text-[#64748B]">
                   {userRole}
                 </p>
               </div>
 
-              <ChevronDown className="hidden sm:block w-4 h-4 text-black/40" />
+              <ChevronDown className="hidden h-4 w-4 text-[#64748B] sm:block" />
             </button>
           </div>
         </div>
 
-        {/* ==========================================================
-            MOBILE SEARCH
-        ========================================================== */}
-        <div className="md:hidden mt-3">
+        <div className="mt-3 md:hidden">
           <div className="relative">
-            <Search
-              className="
-                absolute
-                left-3
-                top-1/2
-                -translate-y-1/2
-                w-4
-                h-4
-                text-black/35
-              "
-            />
-
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
             <input
               type="text"
               value={search}
-              onChange={(event) =>
-                onSearchChange(event.target.value)
-              }
+              onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Rechercher..."
-              className="
-                w-full
-                h-10
-                pl-9
-                pr-4
-                rounded-lg
-                bg-black/[0.02]
-                border border-black/10
-                text-sm
-                text-black
-                placeholder:text-black/35
-                outline-none
-                focus:bg-white
-                focus:border-red-300
-                focus:ring-2
-                focus:ring-red-100
-                transition
-              "
+              className="h-11 w-full rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] pl-10 pr-4 text-sm text-[#202327] placeholder:text-[#64748B] outline-none transition focus:border-[#B4232F] focus:bg-white focus:ring-2 focus:ring-[#B4232F]/10"
             />
           </div>
         </div>

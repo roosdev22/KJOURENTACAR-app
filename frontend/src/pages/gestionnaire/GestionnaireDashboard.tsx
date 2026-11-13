@@ -1,75 +1,105 @@
 import {
-  Car,
-  CheckCircle2,
-  Wrench,
-  CircleOff,
-  ClipboardList,
-  AlertTriangle,
   ArrowRight,
   RefreshCw,
   UserRound,
   CalendarDays,
-  Activity,
   ShieldCheck,
-  TrendingUp,
 } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 import {
   vehicleService,
   type Vehicle,
 } from "../../api/services/vehicleService";
+import reservationService from "../../api/services/reservationService";
+import maintenanceService from "../../api/services/maintenanceService";
+import type { Reservation } from "../../types/reservation";
+import type { Maintenance } from "../../types/maintenance";
+import { MAINTENANCE_STATUS_LABELS } from "../../types/maintenance";
 
 import { useDisplayName } from "../../hooks/useDisplayName";
 
-interface GestionnaireDashboardProps {
-  onNavigateToVehicles?: () => void;
-  onNavigateToRentals?: () => void;
+function formatMaintenanceDate(value: string): string {
+  if (!value) return "—";
+
+  const date = new Date(`${value.slice(0, 10)}T12:00:00`);
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : new Intl.DateTimeFormat("fr-FR").format(date);
 }
 
-const maintenanceItems = [
-  { vehicle: "Toyota RAV4",    type: "Entretien", date: "02/09/2026", status: "J-2" },
-  { vehicle: "Hyundai Tucson", type: "Vidange",   date: "04/09/2026", status: "J-4" },
-  { vehicle: "Kia Sportage",   type: "Contrôle",  date: "07/09/2026", status: "J-7" },
-];
-
-const activities = [
-  { type: "Location créée",      vehicle: "Toyota Corolla", time: "10:32", icon: CheckCircle2 },
-  { type: "Retour confirmé",     vehicle: "Honda CR-V",     time: "09:15", icon: ClipboardList },
-  { type: "Mise en maintenance", vehicle: "Nissan Qashqai", time: "Hier",  icon: Wrench },
-];
-
-export default function GestionnaireDashboard({
-  onNavigateToVehicles,
-  onNavigateToRentals,
-}: GestionnaireDashboardProps) {
+export default function GestionnaireDashboard() {
   const displayName = useDisplayName();
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [maintenances, setMaintenances] = useState<Maintenance[]>([]);
+  const [vehiclesLoading, setVehiclesLoading] = useState(true);
+  const [reservationsLoading, setReservationsLoading] = useState(true);
+  const [maintenancesLoading, setMaintenancesLoading] = useState(true);
+  const [vehiclesError, setVehiclesError] = useState<string | null>(null);
+  const [reservationsError, setReservationsError] = useState<string | null>(null);
+  const [maintenancesError, setMaintenancesError] = useState<string | null>(null);
 
-  const loadVehicles = async () => {
+  const loadVehicles = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
       const data = await vehicleService.getVehicles();
       setVehicles(data);
     } catch (err) {
       console.error("Erreur chargement véhicules dashboard:", err);
-      setError("Impossible de charger les données du parc automobile.");
+      setVehiclesError("Impossible de charger les données du parc automobile.");
     } finally {
-      setLoading(false);
+      setVehiclesLoading(false);
     }
-  };
+  }, []);
+
+  const loadReservations = useCallback(async () => {
+    try {
+      const data = await reservationService.getAllReservations();
+      setReservations(data);
+    } catch (err) {
+      console.error("Erreur chargement locations dashboard:", err);
+      setReservationsError("Impossible de charger les données des réservations.");
+    } finally {
+      setReservationsLoading(false);
+    }
+  }, []);
+
+  const loadMaintenances = useCallback(async () => {
+    try {
+      const data = await maintenanceService.getAll();
+      setMaintenances(data);
+    } catch (err) {
+      console.error("Erreur chargement maintenance dashboard:", err);
+      setMaintenancesError("Impossible de charger les données de maintenance.");
+    } finally {
+      setMaintenancesLoading(false);
+    }
+  }, []);
+
+  const refreshDashboard = useCallback(async () => {
+    await Promise.all([
+      loadVehicles(),
+      loadReservations(),
+      loadMaintenances(),
+    ]);
+  }, [loadMaintenances, loadReservations, loadVehicles]);
+
+  const handleRefresh = useCallback(() => {
+    setVehiclesLoading(true);
+    setReservationsLoading(true);
+    setMaintenancesLoading(true);
+    setVehiclesError(null);
+    setReservationsError(null);
+    setMaintenancesError(null);
+    void refreshDashboard();
+  }, [refreshDashboard]);
 
   useEffect(() => {
-    async function fetchInitial() {
-      await loadVehicles();
-    }
-    void fetchInitial();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    void Promise.resolve().then(refreshDashboard);
+  }, [refreshDashboard]);
 
   const total        = vehicles.length;
   const available    = vehicles.filter((v) => v.status === "AVAILABLE").length;
@@ -79,6 +109,27 @@ export default function GestionnaireDashboard({
   const availablePercentage    = total > 0 ? Math.round((available    / total) * 100) : 0;
   const maintenancePercentage  = total > 0 ? Math.round((maintenance  / total) * 100) : 0;
   const outOfServicePercentage = total > 0 ? Math.round((outOfService / total) * 100) : 0;
+  const ongoingReservations = useMemo(
+    () => reservations.filter((reservation) => reservation.statut === "EN_COURS"),
+    [reservations],
+  );
+  const {
+    plannedMaintenanceCount,
+    plannedMaintenancePreview,
+    maintenanceRecordCount,
+  } = useMemo(() => {
+    const planned = maintenances
+      .filter((item) => item.status === "PLANNED")
+      .sort((left, right) => left.scheduled_date.localeCompare(right.scheduled_date));
+
+    return {
+      plannedMaintenanceCount: planned.length,
+      plannedMaintenancePreview: planned.slice(0, 3),
+      maintenanceRecordCount: maintenances.length,
+    };
+  }, [maintenances]);
+  const isRefreshing =
+    vehiclesLoading || reservationsLoading || maintenancesLoading;
 
   const todayLabel = new Date().toLocaleDateString("fr-FR", {
     day: "numeric",
@@ -86,44 +137,18 @@ export default function GestionnaireDashboard({
     year: "numeric",
   });
 
-  if (loading && vehicles.length === 0) {
-    return (
-      <div className="bg-gray-50">
-        <div className="space-y-6 pb-10">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6">
-            <div className="space-y-3">
-              <div className="h-4 w-40 animate-pulse rounded bg-gray-200" />
-              <div className="h-8 w-72 animate-pulse rounded bg-gray-200" />
-              <div className="h-4 w-full max-w-xl animate-pulse rounded bg-gray-100" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-36 animate-pulse rounded-2xl border border-gray-200 bg-gray-50" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            <div className="h-72 animate-pulse rounded-2xl bg-gray-100" />
-            <div className="h-72 animate-pulse rounded-2xl bg-gray-100" />
-          </div>
-          <div className="h-72 animate-pulse rounded-2xl bg-gray-100" />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-gray-50">
-      <div className="space-y-6 pb-10">
+    <div className="bg-kjou-mist font-kjou-body">
+      <div className="space-y-kjou-section pb-10">
 
         {/* HEADER */}
-        <header className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="border-l-4 border-red-600 p-5 sm:p-6">
+        <header className="overflow-hidden rounded-kjou-card border border-kjou-border bg-kjou-white shadow-sm">
+          <div className="border-l-4 border-kjou-red p-kjou-page-sm sm:p-kjou-page">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
               <div className="min-w-0">
-                <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-gray-400">
-                  <ShieldCheck className="h-4 w-4 text-gray-400" />
+                <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-kjou-muted">
+                  <ShieldCheck className="h-4 w-4 text-kjou-muted" />
                   Espace gestionnaire
                 </div>
 
@@ -132,35 +157,35 @@ export default function GestionnaireDashboard({
                     <UserRound className="h-6 w-6 text-gray-500" />
                   </div>
                   <div className="min-w-0">
-                    <h1 className="truncate text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+                    <h1 className="truncate font-kjou-display text-kjou-page-compact font-extrabold tracking-tight text-kjou-text sm:text-kjou-page">
                       Bonjour, {displayName}
                     </h1>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-kjou-muted">
                       Bienvenue dans votre espace de gestion.
                     </p>
                   </div>
                 </div>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-500">
-                  Consultez l'état du parc automobile et suivez les principales activités de votre agence.
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-kjou-muted">
+                  Consultez l'état du parc automobile et suivez les principales opérations de votre agence.
                 </p>
               </div>
 
               <div className="flex shrink-0 items-center gap-3">
-                <div className="hidden items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 sm:flex">
-                  <CalendarDays className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-600">{todayLabel}</span>
+                <div className="hidden items-center gap-2 rounded-kjou-control border border-kjou-border bg-kjou-mist px-4 py-2.5 sm:flex">
+                  <CalendarDays className="h-4 w-4 text-kjou-muted" />
+                  <span className="text-sm font-semibold text-kjou-text">{todayLabel}</span>
                 </div>
 
                 <button
                   type="button"
-                  onClick={() => void loadVehicles()}
-                  disabled={loading}
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
                   aria-label="Actualiser les données"
                   title="Actualiser"
-                  className="cursor-pointer inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="cursor-pointer inline-flex h-11 items-center justify-center gap-2 rounded-kjou-control border border-kjou-border bg-kjou-white px-4 text-sm font-semibold text-kjou-text shadow-sm transition hover:border-kjou-muted/40 hover:bg-kjou-mist focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-kjou-red focus-visible:ring-offset-kjou focus-visible:ring-offset-kjou-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <RefreshCw className={`h-4 w-4 text-gray-500 ${loading ? "animate-spin" : ""}`} />
+                  <RefreshCw className={`h-4 w-4 text-kjou-muted ${isRefreshing ? "animate-spin" : ""}`} />
                   <span className="hidden sm:inline">Actualiser</span>
                 </button>
               </div>
@@ -168,257 +193,240 @@ export default function GestionnaireDashboard({
           </div>
         </header>
 
-        {/* ERREUR */}
-        {error && (
-          <div className="flex flex-col gap-4 rounded-xl border border-red-100 bg-red-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-red-900">Erreur de chargement</p>
-                <p className="mt-0.5 text-xs text-red-500">{error}</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => void loadVehicles()}
-              className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-700"
-            >
-              Réessayer
-            </button>
-          </div>
-        )}
-
-        {/* KPI */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <DashboardKpi
-            title="Véhicules"
-            value={total}
-            description="Total du parc"
-            icon={Car}
-            iconColor="text-blue-500"
-            iconBg="bg-blue-50"
-          />
-          <DashboardKpi
-            title="Disponibles"
-            value={available}
-            description="Prêts à la location"
-            icon={CheckCircle2}
-            iconColor="text-emerald-500"
-            iconBg="bg-emerald-50"
-          />
-          <DashboardKpi
-            title="Maintenance"
-            value={maintenance}
-            description="Actuellement immobilisés"
-            icon={Wrench}
-            iconColor="text-orange-500"
-            iconBg="bg-orange-50"
-          />
-          <DashboardKpi
-            title="Hors service"
-            value={outOfService}
-            description="Indisponibles"
-            icon={CircleOff}
-            iconColor="text-red-500"
-            iconBg="bg-red-50"
-          />
-        </div>
-
         {/* PARC + LOCATIONS */}
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="flex items-start justify-between">
+          <section className="rounded-kjou-card border border-kjou-border bg-kjou-white p-5 sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h2 className="text-base font-bold text-gray-900">État du parc</h2>
-                <p className="mt-1 text-sm text-gray-500">Répartition actuelle des véhicules</p>
+                <h2 className="font-kjou-display text-kjou-section font-bold text-kjou-text">État du parc</h2>
+                <p className="mt-1 text-sm text-kjou-muted">Répartition parmi les véhicules chargés</p>
               </div>
-              <div className="rounded-xl bg-blue-50 p-3">
-                <TrendingUp className="h-5 w-5 text-blue-500" />
+              <div className="text-right">
+                <p className="text-xs font-medium text-kjou-muted">Véhicules chargés</p>
+                <p className="font-kjou-display text-3xl font-extrabold tracking-tight text-kjou-text">
+                  {vehiclesLoading && vehicles.length === 0
+                    ? "…"
+                    : vehiclesError && vehicles.length === 0
+                      ? "—"
+                      : total}
+                </p>
               </div>
             </div>
 
-            <div className="mt-7 space-y-5">
-              <FleetProgress
-                label="Disponibles"
-                value={availablePercentage}
-                count={available}
-                indicatorClassName="bg-emerald-500"
-                badgeClassName="bg-emerald-50 text-emerald-700"
-              />
-              <FleetProgress
-                label="Maintenance"
-                value={maintenancePercentage}
-                count={maintenance}
-                indicatorClassName="bg-orange-400"
-                badgeClassName="bg-orange-50 text-orange-700"
-              />
-              <FleetProgress
-                label="Hors service"
-                value={outOfServicePercentage}
-                count={outOfService}
-                indicatorClassName="bg-red-400"
-                badgeClassName="bg-red-50 text-red-600"
-              />
-            </div>
+            {vehiclesError && (
+              <div role="alert" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-kjou-control border border-status-danger/20 bg-status-danger/5 p-3 text-sm text-status-danger">
+                <span>{vehiclesError}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVehiclesLoading(true);
+                    setVehiclesError(null);
+                    void loadVehicles();
+                  }}
+                  className="rounded-kjou-control px-2 py-1 font-semibold underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-status-danger"
+                >
+                  Réessayer
+                </button>
+              </div>
+            )}
 
-            <button
-              type="button"
-              onClick={onNavigateToVehicles}
-              className="cursor-pointer mt-7 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition hover:text-gray-900"
+            {vehiclesLoading && vehicles.length === 0 ? (
+              <p role="status" className="mt-6 text-sm text-kjou-muted">
+                Chargement des véhicules…
+              </p>
+            ) : vehicles.length === 0 && !vehiclesError ? (
+              <p role="status" className="mt-6 rounded-kjou-control bg-kjou-mist p-4 text-sm text-kjou-muted">
+                Aucun véhicule n’est présent dans les résultats chargés.
+              </p>
+            ) : vehicles.length > 0 ? (
+              <div className="mt-7 space-y-5">
+                <FleetProgress
+                  label="Disponibles"
+                  value={availablePercentage}
+                  count={available}
+                  indicatorClassName="bg-status-success"
+                />
+                <FleetProgress
+                  label="Maintenance"
+                  value={maintenancePercentage}
+                  count={maintenance}
+                  indicatorClassName="bg-status-warning"
+                />
+                <FleetProgress
+                  label="Hors service"
+                  value={outOfServicePercentage}
+                  count={outOfService}
+                  indicatorClassName="bg-status-danger"
+                />
+              </div>
+            ) : null}
+
+            <Link
+              to="/gestionnaire/vehicles"
+              className="mt-7 inline-flex items-center gap-1.5 text-sm font-semibold text-kjou-text transition hover:text-kjou-red focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-kjou-red focus-visible:ring-offset-kjou focus-visible:ring-offset-kjou-white"
             >
               Gérer les véhicules <ArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
           </section>
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-kjou-card border border-kjou-border bg-kjou-white p-5 sm:p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-base font-bold text-gray-900">Locations du jour</h2>
-                <p className="mt-1 text-sm text-gray-500">Activité opérationnelle</p>
-              </div>
-              <div className="rounded-xl bg-purple-50 p-3">
-                <ClipboardList className="h-5 w-5 text-purple-500" />
+                <h2 className="font-kjou-display text-kjou-section font-bold text-kjou-text">Locations en cours</h2>
+                <p className="mt-1 text-sm text-kjou-muted">Réservations au statut « En cours » dans les résultats chargés</p>
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-3 divide-x divide-gray-100">
-              <RentalStat value={8} label="En cours"    color="text-emerald-600" />
-              <RentalStat value={3} label="À récupérer" color="text-orange-500"  />
-              <RentalStat value={2} label="À rendre"    color="text-red-500"     />
+            <div aria-busy={reservationsLoading} className="mt-6 min-h-24">
+              {reservationsLoading ? (
+                <p role="status" className="text-sm text-kjou-muted">
+                  Chargement des réservations…
+                </p>
+              ) : reservationsError ? (
+                <div role="alert" className="rounded-kjou-control border border-status-danger/20 bg-status-danger/5 p-3 text-sm text-status-danger">
+                  <p>{reservationsError}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReservationsLoading(true);
+                      setReservationsError(null);
+                      void loadReservations();
+                    }}
+                    className="mt-2 font-semibold underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-status-danger"
+                  >
+                    Réessayer
+                  </button>
+                </div>
+              ) : reservations.length === 0 ? (
+                <p role="status" className="text-sm text-kjou-muted">
+                  Aucune réservation n’est présente dans les résultats chargés.
+                </p>
+              ) : (
+                <>
+                  <p className="font-kjou-display text-4xl font-extrabold tracking-tight text-kjou-text">
+                    {ongoingReservations.length}
+                  </p>
+                  <p className="mt-1 text-sm text-kjou-muted">
+                    {ongoingReservations.length === 1
+                      ? "location en cours parmi les résultats chargés"
+                        : "locations en cours parmi les résultats chargés"}
+                  </p>
+                </>
+              )}
             </div>
 
-            <button
-              type="button"
-              onClick={onNavigateToRentals}
-              className="cursor-pointer mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition hover:text-gray-900"
+            <p className="mt-4 text-xs leading-5 text-kjou-muted">
+              Les listes sont paginées par l’API ; ce nombre ne représente que les résultats chargés. Les volumes « À récupérer » et « À rendre » ne sont pas fournis par les données disponibles.
+            </p>
+
+            <Link
+              to="/gestionnaire/rentals"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-kjou-text transition hover:text-kjou-red focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-kjou-red focus-visible:ring-offset-kjou focus-visible:ring-offset-kjou-white"
             >
               Voir les locations <ArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
           </section>
         </div>
 
         {/* MAINTENANCES */}
-        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex flex-col gap-4 border-b border-gray-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <section className="overflow-hidden rounded-kjou-card border border-kjou-border bg-kjou-white">
+          <div className="flex flex-col gap-4 border-b border-kjou-border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div>
-              <div className="flex items-center gap-2">
-                <div className="rounded-lg bg-orange-50 p-2">
-                  <Wrench className="h-4 w-4 text-orange-500" />
-                </div>
-                <h2 className="font-bold text-gray-900">Maintenances à prévoir</h2>
-              </div>
-              <p className="mt-1.5 text-sm text-gray-500">Prochaines interventions sur les véhicules</p>
+              <h2 className="font-kjou-display text-kjou-section font-bold text-kjou-text">Maintenances planifiées</h2>
+              <p className="mt-1.5 text-sm text-kjou-muted">Interventions planifiées parmi les résultats chargés</p>
             </div>
-            <button
-              type="button"
-              className="cursor-pointer inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition hover:text-gray-900"
+            <Link
+              to="/gestionnaire/maintenance"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-kjou-text transition hover:text-kjou-red focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-kjou-red focus-visible:ring-offset-kjou focus-visible:ring-offset-kjou-white"
             >
-              Voir tout <ArrowRight className="h-4 w-4" />
-            </button>
+              Voir le registre <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[680px] text-left">
-              <thead className="bg-gray-50">
-                <tr className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-                  <th className="px-6 py-3.5">Véhicule</th>
-                  <th className="px-6 py-3.5">Intervention</th>
-                  <th className="px-6 py-3.5">Date</th>
-                  <th className="px-6 py-3.5">Échéance</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {maintenanceItems.map((item) => (
-                  <tr key={`${item.vehicle}-${item.date}`} className="transition hover:bg-gray-50/70">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100">
-                          <Car className="h-4 w-4 text-gray-500" />
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900">{item.vehicle}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{item.type}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{item.date}</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-600">
-                        <AlertTriangle className="h-3 w-3" />
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {maintenancesError && (
+            <div role="alert" className="m-5 flex flex-wrap items-center justify-between gap-3 rounded-kjou-control border border-status-danger/20 bg-status-danger/5 p-3 text-sm text-status-danger sm:m-6">
+              <span>{maintenancesError}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setMaintenancesLoading(true);
+                  setMaintenancesError(null);
+                  void loadMaintenances();
+                }}
+                className="rounded-kjou-control px-2 py-1 font-semibold underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-kjou focus-visible:ring-status-danger"
+              >
+                Réessayer
+              </button>
+            </div>
+          )}
+
+          {maintenancesLoading ? (
+            <p role="status" className="p-5 text-sm text-kjou-muted sm:p-6">
+              Chargement des maintenances…
+            </p>
+          ) : maintenancesError ? null : maintenanceRecordCount === 0 ? (
+            <p role="status" className="p-5 text-sm text-kjou-muted sm:p-6">
+              Aucune maintenance n’est présente dans les résultats chargés.
+            </p>
+          ) : plannedMaintenanceCount === 0 ? (
+            <p role="status" className="p-5 text-sm text-kjou-muted sm:p-6">
+              Aucune maintenance planifiée parmi les résultats chargés.
+            </p>
+          ) : (
+            <>
+              {plannedMaintenanceCount > plannedMaintenancePreview.length && (
+                <p className="px-5 pt-4 text-xs text-kjou-muted sm:px-6">
+                  Affichage de {plannedMaintenancePreview.length} interventions sur {plannedMaintenanceCount} planifiées parmi les résultats chargés.
+                </p>
+              )}
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[620px] text-left">
+                  <thead className="bg-kjou-mist">
+                    <tr className="text-xs font-semibold uppercase tracking-wider text-kjou-muted">
+                      <th scope="col" className="px-5 py-3.5 sm:px-6">Véhicule</th>
+                      <th scope="col" className="px-5 py-3.5 sm:px-6">Intervention</th>
+                      <th scope="col" className="px-5 py-3.5 sm:px-6">Date prévue</th>
+                      <th scope="col" className="px-5 py-3.5 sm:px-6">Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-kjou-border">
+                    {plannedMaintenancePreview.map((item) => (
+                      <tr key={item.id} className="transition hover:bg-kjou-mist/60">
+                        <td className="px-5 py-4 text-sm font-semibold text-kjou-text sm:px-6">
+                          {item.vehicle_display || "Véhicule"}
+                        </td>
+                        <td className="px-5 py-4 text-sm text-kjou-muted sm:px-6">
+                          {item.title}
+                        </td>
+                        <td className="px-5 py-4 text-sm text-kjou-muted sm:px-6">
+                          {formatMaintenanceDate(item.scheduled_date)}
+                        </td>
+                        <td className="px-5 py-4 sm:px-6">
+                          <span className="inline-flex rounded-kjou-control bg-kjou-mist px-2.5 py-1 text-xs font-semibold text-kjou-text">
+                            {MAINTENANCE_STATUS_LABELS[item.status]}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </section>
 
         {/* ACTIVITÉS */}
-        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-100 p-5 sm:p-6">
-            <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-gray-100 p-2">
-                <Activity className="h-4 w-4 text-gray-500" />
-              </div>
-              <h2 className="font-bold text-gray-900">Dernières activités</h2>
-            </div>
-            <p className="mt-1.5 text-sm text-gray-500">Activité récente du parc automobile</p>
-          </div>
-
-          <div className="divide-y divide-gray-100">
-            {activities.map((activity) => {
-              const Icon = activity.icon;
-              return (
-                <div
-                  key={`${activity.type}-${activity.vehicle}`}
-                  className="flex items-center gap-4 px-5 py-4 transition hover:bg-gray-50/70 sm:px-6"
-                >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100">
-                    <Icon className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">{activity.type}</p>
-                    <p className="mt-0.5 truncate text-xs text-gray-500">{activity.vehicle}</p>
-                  </div>
-                  <span className="shrink-0 text-xs text-gray-400">{activity.time}</span>
-                </div>
-              );
-            })}
-          </div>
+        <section className="rounded-kjou-card border border-kjou-border bg-kjou-white p-5 sm:p-6">
+          <h2 className="font-kjou-display text-kjou-section font-bold text-kjou-text">
+            Activité opérationnelle
+          </h2>
+          <p role="status" className="mt-2 text-sm leading-6 text-kjou-muted">
+            Le flux d’activité n’est pas disponible dans les sources actuelles. Consultez les pages des réservations, locations et maintenances pour leurs données à jour.
+          </p>
         </section>
 
       </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   KPI
-   ============================================================ */
-
-function DashboardKpi({ title, value, description, icon: Icon, iconColor, iconBg }: {
-  title: string;
-  value: number;
-  description: string;
-  icon: typeof Car;
-  iconColor: string;
-  iconBg: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="mt-2 text-3xl font-black tracking-tight text-gray-900">{value}</p>
-        </div>
-        <div className={`rounded-xl p-3 ${iconBg}`}>
-          <Icon className={`h-5 w-5 ${iconColor}`} />
-        </div>
-      </div>
-      <p className="mt-3 text-xs text-gray-400">{description}</p>
     </div>
   );
 }
@@ -427,47 +435,36 @@ function DashboardKpi({ title, value, description, icon: Icon, iconColor, iconBg
    FLEET PROGRESS
    ============================================================ */
 
-function FleetProgress({ label, value, count, indicatorClassName, badgeClassName }: {
+function FleetProgress({ label, value, count, indicatorClassName }: {
   label: string;
   value: number;
   count: number;
   indicatorClassName: string;
-  badgeClassName: string;
 }) {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">{label}</span>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${badgeClassName}`}>
+          <span className="text-sm font-medium text-kjou-text">{label}</span>
+          <span className="rounded-kjou-control bg-kjou-mist px-2 py-0.5 text-xs font-semibold text-kjou-text">
             {count}
           </span>
         </div>
-        <span className="text-sm font-semibold text-gray-700">{value}%</span>
+        <span className="text-sm font-semibold text-kjou-text">{value}%</span>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+      <div
+        role="progressbar"
+        aria-label={`Part des véhicules ${label.toLocaleLowerCase("fr")}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={value}
+        className="h-1.5 overflow-hidden rounded-full bg-kjou-mist"
+      >
         <div
           className={`h-full rounded-full transition-all duration-700 ${indicatorClassName}`}
           style={{ width: `${Math.min(value, 100)}%` }}
         />
       </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   RENTAL STAT
-   ============================================================ */
-
-function RentalStat({ value, label, color }: {
-  value: number;
-  label: string;
-  color: string;
-}) {
-  return (
-    <div className="px-4 text-center first:pl-0 last:pr-0">
-      <p className={`text-3xl font-black tracking-tight ${color}`}>{value}</p>
-      <p className="mt-1.5 text-xs text-gray-500">{label}</p>
     </div>
   );
 }

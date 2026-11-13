@@ -1,48 +1,3 @@
-# apps/vehicles/views.py
-
-"""
-Views / ViewSets — KJOURRENTACAR / Vehicles
-
-Gestion du parc automobile.
-
-Rôles
------
-
-CLIENT
-    - Consulte uniquement les véhicules disponibles.
-    - Peut consulter les détails des véhicules disponibles.
-    - Aucun droit de création/modification/suppression.
-
-AGENT
-    - Peut consulter les véhicules.
-    - Peut effectuer certaines opérations du parc :
-        * changement de statut
-        * changement de condition
-    - Ne peut pas créer/modifier/supprimer un véhicule.
-
-GESTIONNAIRE
-    - Peut gérer le parc automobile.
-    - Création
-    - Modification
-    - Gestion des images
-    - Changement de statut / condition
-
-ADMIN
-    - Gestion complète des véhicules.
-    - Suppression autorisée.
-
-SUPER_ADMIN
-    - Accès complet.
-
-IMPORTANT
----------
-
-Le filtrage des véhicules visibles par le CLIENT est effectué
-côté serveur.
-
-Le CLIENT ne peut donc jamais demander directement un véhicule
-indisponible pour contourner le frontend.
-"""
 
 
 from typing import Any
@@ -57,6 +12,8 @@ from rest_framework.parsers import (
     JSONParser,
     MultiPartParser,
 )
+
+from django.db import models, transaction
 from rest_framework.permissions import BasePermission
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -91,6 +48,15 @@ from .permissions import (
     IsVehicleEmployee,
 )
 
+
+from django.db.models import Exists, OuterRef
+from django.utils.dateparse import parse_date
+
+from reservations.models import (
+    LigneReservation,
+    ReservationStatus,
+)
+from payments.models import PaymentStatus
 
 # ============================================================
 # VEHICLE VIEWSET
@@ -217,9 +183,73 @@ class VehicleViewSet(viewsets.ModelViewSet):
         # CLIENT
         # ----------------------------------------------------
 
+       
         if role == "CLIENT":
-            return queryset.filter(
+            queryset = queryset.filter(
                 status=VehicleStatus.AVAILABLE
+            )
+
+            date_debut_param = self.request.query_params.get(
+                "date_debut"
+            )
+            date_fin_param = self.request.query_params.get(
+                "date_fin"
+            )
+
+            # Sans dates, conserver le comportement actuel.
+            if not date_debut_param and not date_fin_param:
+                return queryset
+
+            # Les deux dates sont obligatoires ensemble.
+            date_debut = parse_date(date_debut_param or "")
+            date_fin = parse_date(date_fin_param or "")
+
+            if (
+                date_debut is None
+                or date_fin is None
+                or date_debut >= date_fin
+            ):
+                return queryset.none()
+
+            reservations_bloquantes = (
+                LigneReservation.objects.filter(
+                    vehicule_id=OuterRef("pk"),
+                    reservation__date_debut__lt=date_fin,
+                    reservation__date_fin__gt=date_debut,
+                )
+                .filter(
+                    # Réservations confirmées ou en cours.
+                    (
+                        models.Q(
+                            reservation__statut__in=[
+                                ReservationStatus.CONFIRMED,
+                                ReservationStatus.EN_COURS,
+                            ]
+                        )
+                    )
+                    |
+                    # Réservations en attente avec paiement réussi.
+                    (
+                        models.Q(
+                            reservation__statut=(
+                                ReservationStatus.PENDING_VERIFICATION
+                            )
+                        )
+                        & models.Q(
+                            reservation__paiements__statut=(
+                                PaymentStatus.SUCCEEDED
+                            )
+                        )
+                    )
+                )
+            )
+
+            return queryset.annotate(
+                reservation_bloquante=Exists(
+                    reservations_bloquantes
+                )
+            ).filter(
+                reservation_bloquante=False
             )
 
         # ----------------------------------------------------

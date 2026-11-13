@@ -1,6 +1,5 @@
-import { Search } from "lucide-react";
-
 import type { UserRole } from "../../../api/services/authService";
+import AdminIcon from "../AdminIcon";
 
 import {
   USER_ROLES,
@@ -47,9 +46,9 @@ export default function UserFilters({
     <div
       className="
         mb-5
-        rounded-xl
+        rounded-kjou-card
         border
-        border-black/10
+        border-kjou-border
         bg-white
         p-4
       "
@@ -72,7 +71,8 @@ export default function UserFilters({
             lg:col-span-2
           "
         >
-          <Search
+          <AdminIcon
+            name="search"
             size={18}
             className="
               absolute
@@ -86,6 +86,7 @@ export default function UserFilters({
           <input
             type="text"
             value={search}
+            aria-label="Rechercher un utilisateur"
             placeholder="Rechercher un utilisateur..."
             onChange={(event) =>
               onSearchChange(
@@ -103,7 +104,9 @@ export default function UserFilters({
               text-sm
               outline-none
               transition
-              focus:border-red-600
+              focus:border-kjou-red
+              focus:ring-2
+              focus:ring-kjou-red/10
             "
           />
         </div>
@@ -113,6 +116,7 @@ export default function UserFilters({
         ===================================================== */}
         <select
           value={role}
+          aria-label="Filtrer par rôle"
           onChange={(event) => {
             const value =
               event.target.value;
@@ -136,7 +140,9 @@ export default function UserFilters({
             text-sm
             outline-none
             transition
-            focus:border-red-600
+            focus:border-kjou-red
+            focus:ring-2
+            focus:ring-kjou-red/10
           "
         >
           <option value="">
@@ -158,6 +164,7 @@ export default function UserFilters({
         ===================================================== */}
         <select
           value={activeFilter}
+          aria-label="Filtrer par statut"
           onChange={(event) => {
             const value =
               event.target.value as
@@ -177,7 +184,9 @@ export default function UserFilters({
             text-sm
             outline-none
             transition
-            focus:border-red-600
+            focus:border-kjou-red
+            focus:ring-2
+            focus:ring-kjou-red/10
           "
         >
           <option value="">

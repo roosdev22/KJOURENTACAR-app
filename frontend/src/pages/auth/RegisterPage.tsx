@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle, Check, Car } from "lucide-react";
 import { authService } from "../../api/services/authService";
-import axios from "axios";
+import { getApiErrorMessage } from "../../utils/apiError";
 interface FormData {
   first_name: string;
   last_name: string;
@@ -110,82 +110,89 @@ export default function RegisterPage() {
       state: { registered: true, email: form.email },
     });
 
+  
   } catch (err: unknown) {
-    if (axios.isAxiosError(err) && err.response) {
-      const status = err.response.status;
-      const data   = err.response.data;
+    console.error("Échec de l'inscription.");
 
-      // --------------------------------------------------------
-      // 500 — erreur serveur imprévue
-      // --------------------------------------------------------
-      if (status >= 500) {
-        setGlobalError(
-          "Une erreur inattendue s'est produite. Veuillez réessayer dans quelques instants."
-        );
-        console.error("Erreur serveur:", data);
-        return;
-      }
+    const axiosError = err as {
+      response?: {
+        status?: number;
+        data?: Record<string, unknown>;
+      };
+    };
 
-     
-      if (status === 400 && typeof data === "object" && data !== null) {
+    const status = axiosError.response?.status;
+    const data = axiosError.response?.data;
 
-        const fieldMap: Record<string, keyof FormErrors> = {
-          email:            "email",
-          password:         "password",
-          password_confirm: "password_confirm",
-          first_name:       "first_name",
-          last_name:        "last_name",
-        };
-
-        const newErrors: FormErrors = {};
-        let   globalMsg = "";
-
-        for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
-          const message = Array.isArray(value) ? value[0] : String(value);
-
-          if (key === "non_field_errors" || key === "detail") {
-            // Erreur globale — pas liée à un champ
-            globalMsg = message;
-          } else if (key in fieldMap) {
-            // Erreur liée à un champ → affiche sous le champ
-            newErrors[fieldMap[key]] = message;
-          } else {
-            // Champ inconnu → fallback global
-            globalMsg = globalMsg || message;
-          }
-        }
-
-        if (Object.keys(newErrors).length > 0) setErrors(newErrors);
-        if (globalMsg) setGlobalError(globalMsg);
-
-        // Si rien n'a été extrait malgré un 400
-        if (Object.keys(newErrors).length === 0 && !globalMsg) {
-          setGlobalError("Données invalides. Vérifiez le formulaire.");
-        }
-
-        return;
-      }
-
-      // --------------------------------------------------------
-      // Autres codes (401, 403, etc.)
-      // --------------------------------------------------------
+    if (status !== undefined && status >= 500) {
       setGlobalError(
-        (data as Record<string, string>)?.detail ??
-        "Une erreur est survenue. Veuillez réessayer."
+        "Une erreur inattendue s'est produite. Veuillez réessayer dans quelques instants."
       );
-
-    } else {
-      // Pas de réponse — problème réseau
-      setGlobalError(
-        "Impossible de contacter le serveur. Vérifiez votre connexion."
-      );
+      return;
     }
 
-    console.error(err);
+    if (data) {
+      const fieldMap: Record<string, keyof FormErrors> = {
+        email: "email",
+        password: "password",
+        password_confirm: "password_confirm",
+        first_name: "first_name",
+        last_name: "last_name",
+      };
 
+      const newErrors: FormErrors = {};
+      let globalMsg = "";
+
+      for (const [key, value] of Object.entries(data)) {
+        const messages = Array.isArray(value)
+          ? value.map(String)
+          : typeof value === "string"
+            ? [value]
+            : [];
+
+        if (messages.length === 0) {
+          continue;
+        }
+
+        if (
+          key === "non_field_errors" ||
+          key === "detail" ||
+          key === "error"
+        ) {
+          globalMsg = messages.join(" ");
+        } else if (key in fieldMap) {
+          newErrors[fieldMap[key]] = messages.join(" ");
+        } else {
+          globalMsg ||= messages.join(" ");
+        }
+      }
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+      }
+
+      if (globalMsg) {
+        setGlobalError(globalMsg);
+      }
+
+      if (
+        Object.keys(newErrors).length > 0 ||
+        globalMsg
+      ) {
+        return;
+      }
+    }
+
+    setGlobalError(
+      getApiErrorMessage(
+        err,
+        "Impossible de créer votre compte. Veuillez réessayer."
+      )
+    );
   } finally {
     setIsLoading(false);
   }
+
 };
 
 

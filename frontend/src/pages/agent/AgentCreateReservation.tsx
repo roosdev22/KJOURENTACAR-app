@@ -7,8 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import reservationService from "../../api/services/reservationService";
-
-import axios from "axios";
+import { getApiErrorMessage } from "../../utils/apiError";
 
 import {
   authService,
@@ -104,48 +103,26 @@ useEffect(() => {
       );
 
       setClients(clientUsers);
-    } catch (error) {
-      // ------------------------------------------------------
-      // DIAGNOSTIC TEMPORAIRE
-      // ------------------------------------------------------
-      if (axios.isAxiosError(error)) {
-        console.group("🔍 Diagnostic getClients");
-
-        console.log("baseURL :", error.config?.baseURL);
-        console.log("url     :", error.config?.url);
-
-        console.log(
-          "URL finale :",
-          `${error.config?.baseURL ?? ""}${error.config?.url ?? ""}`
-        );
-
-        console.log("Statut  :", error.response?.status);
-        console.log("Corps   :", error.response?.data);
-
-        console.groupEnd();
-      } else {
-        console.error("Erreur inattendue :", error);
-      }
-
+    
+    } catch (error: unknown) {
       if (!isMounted) {
         return;
       }
 
-      const backendDetail =
-        axios.isAxiosError(error) &&
-        typeof error.response?.data?.detail === "string"
-          ? error.response.data.detail
-          : null;
+      console.error("Erreur lors du chargement des clients.");
 
       setClientsError(
-        backendDetail ??
+        getApiErrorMessage(
+          error,
           "Impossible de charger la liste des clients."
+        )
       );
     } finally {
       if (isMounted) {
         setIsLoadingClients(false);
       }
     }
+
   }
 
   loadClients();
@@ -174,24 +151,26 @@ useEffect(() => {
         }
 
         setVehicles(data);
-      } catch (error) {
-        console.error(
-          "Erreur chargement véhicules :",
-          error
-        );
-
+       
+      } catch (error: unknown) {
         if (!isMounted) {
           return;
         }
 
+        console.error("Erreur lors du chargement des véhicules.");
+
         setVehiclesError(
-          "Impossible de charger les véhicules."
+          getApiErrorMessage(
+            error,
+            "Impossible de charger les véhicules."
+          )
         );
       } finally {
         if (isMounted) {
           setIsLoadingVehicles(false);
         }
       }
+
     }
 
     loadVehicles();
@@ -283,11 +262,21 @@ useEffect(() => {
   // RETOUR AUX RÉSERVATIONS
   // ============================================================
 
+  function handleDateDebutChange(value: string) {
+  setDateDebut(value);
+
+  if (dateFin && value && dateFin <= value) {
+    setDateFin("");
+  }
+
+  setSubmitError(null);
+}
+
  async function handleCreateReservation() {
   if (!selectedClient) {
     setSubmitError("Veuillez sélectionner un client.");
     return;
-  }
+  } 
 
   if (!dateDebut || !dateFin) {
     setSubmitError(
@@ -295,6 +284,13 @@ useEffect(() => {
     );
     return;
   }
+
+  if (dateFin <= dateDebut) {
+  setSubmitError(
+    "La date de fin doit être strictement postérieure à la date de début."
+  );
+  return;
+}
 
   if (selectedVehicleIds.length === 0) {
     setSubmitError(
@@ -318,17 +314,61 @@ useEffect(() => {
       });
 
     navigate(`/agent/reservations/${reservation.id}`);
+  
+  
   } catch (error: unknown) {
+    let backendData: Record<string, unknown> | null = null;
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error
+    ) {
+      const response = error.response;
+
+      if (
+        typeof response === "object" &&
+        response !== null &&
+        "data" in response
+      ) {
+        const data = response.data;
+
+        if (
+          typeof data === "object" &&
+          data !== null &&
+          !Array.isArray(data)
+        ) {
+          backendData = data as Record<string, unknown>;
+        }
+      }
+    }
+
+    // Garder la réponse réelle du backend pour le diagnostic.
     console.error(
-      "Erreur création réservation :",
-      error
+      "Erreur de création de réservation :",
+      backendData ?? error
     );
 
-    setSubmitError(
-      error instanceof Error
-        ? error.message
-        : "Impossible d'enregistrer la réservation."
-    );
+    let message: string;
+
+    if (
+      backendData?.code === "VEHICLE_RESERVATION_CONFLICT"
+    ) {
+      message =
+        "Le véhicule sélectionné n’est pas disponible pour cette période. Veuillez choisir un autre véhicule ou modifier les dates.";
+    } else if (
+      backendData?.code === "VEHICLE_UNAVAILABLE"
+    ) {
+      message =
+        "Le véhicule sélectionné n’est plus disponible. Veuillez en choisir un autre.";
+    } else {
+      message = getApiErrorMessage(
+        error,
+        "Impossible de créer la réservation. Vérifiez les dates, le client et les véhicules sélectionnés."
+      );
+    }
+
+    setSubmitError(message);
   } finally {
     setIsSubmitting(false);
   }
@@ -443,12 +483,17 @@ useEffect(() => {
 
           {selectedClient && (
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                            
               <AgentReservationDates
                 dateDebut={dateDebut}
                 dateFin={dateFin}
-                onDateDebutChange={setDateDebut}
-                onDateFinChange={setDateFin}
+                onDateDebutChange={handleDateDebutChange}
+                onDateFinChange={(value) => {
+                  setDateFin(value);
+                  setSubmitError(null);
+                }}
               />
+
             </section>
           )}
 

@@ -11,58 +11,37 @@ export default function WelcomeBanner({
   const hour = new Date().getHours();
 
   const greeting =
-    hour < 12
-      ? "Bonjour"
-      : hour < 18
-        ? "Bon après-midi"
-        : "Bonsoir";
+    hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white px-8 py-7 shadow-sm">
-      {/* Cercles décoratifs */}
-      <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-red-50" />
+    <div className="relative overflow-hidden rounded-3xl border border-[#E3E6E8] bg-[#17191C] px-6 py-7 text-white shadow-[0_18px_34px_rgba(23,25,28,0.12)] sm:px-8">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-[#B4232F]/20" />
+      <div className="pointer-events-none absolute bottom-0 right-10 h-28 w-28 rounded-full bg-[#B4232F]/15" />
 
-      <div className="pointer-events-none absolute bottom-0 right-20 h-28 w-28 rounded-full bg-red-50/70" />
-
-      {/* Contenu */}
-      <div className="relative z-10">
-        <div className="mb-1 flex items-center gap-2">
-          <p className="text-sm font-medium text-gray-500">
-            {greeting}
-          </p>
-
-          <Hand
-            size={18}
-            strokeWidth={2}
-            className="text-red-600"
-          />
-        </div>
-
-        <h1 className="mb-1 text-2xl font-bold text-gray-900">
-          {userName}
-        </h1>
-
-        <p className="mb-6 text-sm text-gray-500">
-          Voici un aperçu de vos locations.
-        </p>
-
+      <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="mb-2 text-base font-semibold text-gray-900">
-            Prêt pour votre prochaine aventure ?
-          </p>
+          <div className="mb-2 flex items-center gap-2 text-sm text-white/70">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]">
+              {greeting}
+            </span>
+            <Hand size={18} strokeWidth={2} className="text-[#B4232F]" />
+          </div>
 
-          <p className="mb-4 text-sm text-gray-500">
-            Trouvez le véhicule idéal pour votre prochain déplacement.
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+            {userName}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-white/70">
+            Voici un aperçu de vos locations, réservations et prochaines actions.
           </p>
-
-          <Link
-            to="/reservations"
-            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
-          >
-            Réserver un véhicule
-            <ArrowRight size={15} />
-          </Link>
         </div>
+
+        <Link
+          to="/reservation"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#B4232F] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#941C27]"
+        >
+          Réserver un véhicule
+          <ArrowRight size={15} />
+        </Link>
       </div>
     </div>
   );

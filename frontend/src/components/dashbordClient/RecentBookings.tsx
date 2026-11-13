@@ -73,7 +73,7 @@ export default function RecentBookings({
           </p>
 
           <Link
-            to="/reserver"
+            to=""
             className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
           >
             Réserver maintenant

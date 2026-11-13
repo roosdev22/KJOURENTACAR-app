@@ -65,12 +65,11 @@ export default function NextBookingWidget({
             Aucune réservation à venir
           </p>
 
-          <Link
-            to="/reserver"
+          <Link 
+            to="/reservation"
             className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-red-600 transition-colors hover:text-red-700"
           >
             Réserver maintenant
-
             <ArrowRight size={14} />
           </Link>
         </div>

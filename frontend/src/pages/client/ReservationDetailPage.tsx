@@ -1,18 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  AlertCircle,
-  ArrowLeft,
-  CalendarDays,
-  Car,
-  CheckCircle2,
-  Clock3,
-  CreditCard,
-  FileText,
-  Loader2,
-  ShieldCheck,
-  XCircle,
-} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import AdminIcon, { type AdminIconName } from "../../components/admin/AdminIcon";
 
 import { reservationService } from "../../api/services/reservationService";
 import type {
@@ -82,7 +70,7 @@ function formatMoney(value: string | number | null | undefined): string {
 interface StatusConfig {
   label: string;
   description: string;
-  icon: React.ElementType;
+  icon: AdminIconName;
   className: string;
   iconClassName: string;
 }
@@ -94,10 +82,10 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
         label: "En attente de vérification",
         description:
           "Votre réservation a bien été enregistrée et attend la vérification de notre équipe.",
-        icon: Clock3,
+        icon: "clock",
         className:
-          "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300",
-        iconClassName: "text-amber-600 dark:text-amber-400",
+          "border-[#F2D29B] bg-[#FFF8ED] text-[#A2650F]",
+        iconClassName: "text-[#B7791F]",
       };
 
     case "CONFIRMED":
@@ -105,10 +93,10 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
         label: "Confirmée",
         description:
           "Votre réservation a été confirmée par notre équipe.",
-        icon: CheckCircle2,
+        icon: "check-circle",
         className:
-          "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300",
-        iconClassName: "text-emerald-600 dark:text-emerald-400",
+          "border-[#B9E6D0] bg-[#EAF7F0] text-[#126A49]",
+        iconClassName: "text-[#16845B]",
       };
 
     case "CANCELLED":
@@ -116,10 +104,10 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
         label: "Annulée",
         description:
           "Cette réservation a été annulée.",
-        icon: XCircle,
+        icon: "x-circle",
         className:
-          "border-red-200 bg-red-50 text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300",
-        iconClassName: "text-red-600 dark:text-red-400",
+          "border-[#F0B4BC] bg-[#FFF5F6] text-[#B4232F]",
+        iconClassName: "text-[#B4232F]",
       };
 
     case "EN_COURS":
@@ -127,10 +115,10 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
         label: "En cours",
         description:
           "La location correspondant à cette réservation est actuellement en cours.",
-        icon: Car,
+        icon: "car-front",
         className:
-          "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-300",
-        iconClassName: "text-blue-600 dark:text-blue-400",
+          "border-[#D5E3FA] bg-[#F1F6FF] text-[#2457A6]",
+        iconClassName: "text-[#2457A6]",
       };
 
     case "TERMINEE":
@@ -138,20 +126,20 @@ function getStatusConfig(status: ReservationStatus): StatusConfig {
         label: "Terminée",
         description:
           "La location correspondant à cette réservation est terminée.",
-        icon: CheckCircle2,
+        icon: "check-circle",
         className:
-          "border-slate-200 bg-slate-50 text-slate-800 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-300",
-        iconClassName: "text-slate-600 dark:text-slate-400",
+          "border-[#E3E6E8] bg-[#F4F5F6] text-[#64748B]",
+        iconClassName: "text-[#64748B]",
       };
 
     default:
       return {
         label: status,
         description: "",
-        icon: AlertCircle,
+        icon: "alert",
         className:
-          "border-slate-200 bg-slate-50 text-slate-800 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-300",
-        iconClassName: "text-slate-600 dark:text-slate-400",
+          "border-[#E3E6E8] bg-[#F4F5F6] text-[#64748B]",
+        iconClassName: "text-[#64748B]",
       };
   }
 }
@@ -198,28 +186,28 @@ function getErrorMessage(error: unknown): string {
 // ============================================================
 
 interface InfoItemProps {
-  icon: React.ElementType;
+  icon: AdminIconName;
   label: string;
   value: React.ReactNode;
 }
 
 function InfoItem({
-  icon: Icon,
+  icon,
   label,
   value,
 }: InfoItemProps) {
   return (
     <div className="flex items-start gap-3">
-      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-        <Icon className="h-4 w-4" aria-hidden="true" />
+      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F4F5F6] text-[#64748B]">
+        <AdminIcon name={icon} size={17} />
       </div>
 
       <div className="min-w-0">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-[#64748B]">
           {label}
         </p>
 
-        <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
+        <div className="mt-1 text-sm font-semibold text-[#202327]">
           {value}
         </div>
       </div>
@@ -229,24 +217,21 @@ function InfoItem({
 
 function Section({
   title,
-  icon: Icon,
+  icon,
   children,
 }: {
   title: string;
-  icon: React.ElementType;
+  icon: AdminIconName;
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center gap-3 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
-          <Icon
-            className="h-4 w-4 text-slate-700 dark:text-slate-300"
-            aria-hidden="true"
-          />
+    <section className="rounded-2xl border border-[#E3E6E8] bg-white shadow-sm">
+      <div className="flex items-center gap-3 border-b border-[#E3E6E8] px-5 py-4">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F4F5F6] text-[#64748B]">
+          <AdminIcon name={icon} size={17} />
         </div>
 
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+        <h2 className="text-base font-semibold text-[#202327]">
           {title}
         </h2>
       </div>
@@ -329,15 +314,12 @@ const ReservationDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-950">
+      <main className="min-h-screen bg-[#F4F5F6] px-4 py-8">
         <div className="mx-auto flex min-h-[60vh] max-w-6xl items-center justify-center">
           <div className="flex flex-col items-center gap-3 text-center">
-            <Loader2
-              className="h-8 w-8 animate-spin text-slate-600 dark:text-slate-300"
-              aria-hidden="true"
-            />
+            <AdminIcon name="loader" size={30} className="animate-spin text-[#64748B]" />
 
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-[#64748B]">
               Chargement de la réservation...
             </p>
           </div>
@@ -352,33 +334,30 @@ const ReservationDetailPage: React.FC = () => {
 
   if (error || !reservation || !statusConfig) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-950">
+      <main className="min-h-screen bg-[#F4F5F6] px-4 py-8">
         <div className="mx-auto max-w-4xl">
           <button
             type="button"
             onClick={() => navigate("/reservations")}
-            className="mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"
+            className="mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#64748B] transition hover:bg-white hover:text-[#202327] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B4232F]"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <AdminIcon name="arrow-left" size={17} />
             Retour à mes réservations
           </button>
 
           <div
             role="alert"
-            className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-900/50 dark:bg-red-950/20"
+            className="rounded-2xl border border-[#F0B4BC] bg-[#FFF5F6] p-6"
           >
             <div className="flex items-start gap-3">
-              <AlertCircle
-                className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400"
-                aria-hidden="true"
-              />
+              <AdminIcon name="alert" size={20} className="mt-0.5 shrink-0 text-[#B4232F]" />
 
               <div>
-                <h1 className="font-semibold text-red-900 dark:text-red-300">
+                <h1 className="font-semibold text-[#202327]">
                   Impossible d'afficher la réservation
                 </h1>
 
-                <p className="mt-1 text-sm text-red-700 dark:text-red-400">
+                <p className="mt-1 text-sm text-[#B4232F]">
                   {error ?? "La réservation demandée est introuvable."}
                 </p>
               </div>
@@ -389,14 +368,12 @@ const ReservationDetailPage: React.FC = () => {
     );
   }
 
-  const StatusIcon = statusConfig.icon;
-
   // ----------------------------------------------------------
   // RENDER
   // ----------------------------------------------------------
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-950">
+    <main className="min-h-screen bg-[#F4F5F6] px-4 py-8">
       <div className="mx-auto max-w-6xl">
         {/* ================================================== */}
         {/* HEADER                                             */}
@@ -406,23 +383,23 @@ const ReservationDetailPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate("/reservations")}
-            className="mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"
+            className="mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#64748B] transition hover:bg-white hover:text-[#202327] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B4232F]"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <AdminIcon name="arrow-left" size={17} />
             Mes réservations
           </button>
 
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                Réservation
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4232F]">
+                Dossier de location
               </p>
 
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#202327] sm:text-3xl">
                 {reservation.numero}
               </h1>
 
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              <p className="mt-2 text-sm text-[#64748B]">
                 Créée le {formatDateTime(reservation.created_at)}
               </p>
             </div>
@@ -430,10 +407,7 @@ const ReservationDetailPage: React.FC = () => {
             <div
               className={`inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold ${statusConfig.className}`}
             >
-              <StatusIcon
-                className={`h-4 w-4 ${statusConfig.iconClassName}`}
-                aria-hidden="true"
-              />
+              <AdminIcon name={statusConfig.icon} size={17} className={statusConfig.iconClassName} />
 
               {reservation.statut_display || statusConfig.label}
             </div>
@@ -448,14 +422,11 @@ const ReservationDetailPage: React.FC = () => {
           className={`mb-6 rounded-2xl border p-5 ${statusConfig.className}`}
         >
           <div className="flex items-start gap-3">
-            <StatusIcon
-              className={`mt-0.5 h-5 w-5 shrink-0 ${statusConfig.iconClassName}`}
-              aria-hidden="true"
-            />
+            <AdminIcon name={statusConfig.icon} size={20} className={`mt-0.5 shrink-0 ${statusConfig.iconClassName}`} />
 
             <div>
               <h2 className="font-semibold">
-                {statusConfig.label}
+                Suivi de la réservation
               </h2>
 
               {statusConfig.description && (
@@ -479,22 +450,22 @@ const ReservationDetailPage: React.FC = () => {
           <div className="space-y-6">
             {/* PERIOD */}
 
-            <Section title="Période de location" icon={CalendarDays}>
+            <Section title="Période de location" icon="calendar-check">
               <div className="grid gap-5 sm:grid-cols-3">
                 <InfoItem
-                  icon={CalendarDays}
+                  icon="calendar-check"
                   label="Début"
                   value={formatDate(reservation.date_debut)}
                 />
 
                 <InfoItem
-                  icon={CalendarDays}
+                  icon="calendar-check"
                   label="Fin"
                   value={formatDate(reservation.date_fin)}
                 />
 
                 <InfoItem
-                  icon={Clock3}
+                  icon="clock"
                   label="Durée"
                   value={`${reservation.nombre_jours} jour${
                     reservation.nombre_jours > 1 ? "s" : ""
@@ -505,14 +476,11 @@ const ReservationDetailPage: React.FC = () => {
 
             {/* VEHICLES */}
 
-            <Section title="Véhicules réservés" icon={Car}>
+            <Section title="Véhicules réservés" icon="car-front">
               <div className="space-y-4">
                 {reservation.lignes.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center dark:border-slate-700">
-                    <Car
-                      className="mx-auto h-8 w-8 text-slate-400"
-                      aria-hidden="true"
-                    />
+                    <AdminIcon name="car-front" size={32} className="mx-auto text-[#64748B]" />
 
                     <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                       Aucun véhicule associé à cette réservation.
@@ -527,10 +495,7 @@ const ReservationDetailPage: React.FC = () => {
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex min-w-0 items-start gap-3">
                           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
-                            <Car
-                              className="h-5 w-5 text-slate-600 dark:text-slate-300"
-                              aria-hidden="true"
-                            />
+                            <AdminIcon name="car-front" size={21} className="text-[#64748B]" />
                           </div>
 
                           <div className="min-w-0">
@@ -558,7 +523,7 @@ const ReservationDetailPage: React.FC = () => {
 
                       <div className="mt-4 grid gap-3 border-t border-slate-200 pt-4 sm:grid-cols-2 dark:border-slate-800">
                         <InfoItem
-                          icon={CreditCard}
+                          icon="credit-card"
                           label="Prix journalier"
                           value={formatMoney(
                             line.prix_journalier_unitaire
@@ -566,7 +531,7 @@ const ReservationDetailPage: React.FC = () => {
                         />
 
                         <InfoItem
-                          icon={ShieldCheck}
+                          icon="shield"
                           label="Caution"
                           value={formatMoney(line.caution_unitaire)}
                         />
@@ -592,7 +557,7 @@ const ReservationDetailPage: React.FC = () => {
             {/* CLIENT NOTES */}
 
             {reservation.notes_client && (
-              <Section title="Notes du client" icon={FileText}>
+              <Section title="Notes du client" icon="file">
                 <p className="whitespace-pre-wrap text-sm leading-6 text-slate-700 dark:text-slate-300">
                   {reservation.notes_client}
                 </p>
@@ -602,10 +567,10 @@ const ReservationDetailPage: React.FC = () => {
             {/* CANCELLATION */}
 
             {reservation.statut === "CANCELLED" && (
-              <Section title="Annulation" icon={XCircle}>
+              <Section title="Annulation" icon="x-circle">
                 <div className="space-y-4">
                   <InfoItem
-                    icon={Clock3}
+                    icon="clock"
                     label="Date d'annulation"
                     value={formatDateTime(
                       reservation.date_annulation
@@ -630,9 +595,9 @@ const ReservationDetailPage: React.FC = () => {
             {/* CONFIRMATION */}
 
             {reservation.date_confirmation && (
-              <Section title="Confirmation" icon={CheckCircle2}>
+              <Section title="Confirmation" icon="check-circle">
                 <InfoItem
-                  icon={CheckCircle2}
+                  icon="check-circle"
                   label="Date de confirmation"
                   value={formatDateTime(
                     reservation.date_confirmation
@@ -651,10 +616,7 @@ const ReservationDetailPage: React.FC = () => {
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-center gap-2">
-                <CreditCard
-                  className="h-5 w-5 text-slate-600 dark:text-slate-300"
-                  aria-hidden="true"
-                />
+                <AdminIcon name="credit-card" size={20} className="text-[#64748B]" />
 
                 <h2 className="font-semibold text-slate-900 dark:text-white">
                   Récapitulatif financier
@@ -698,14 +660,11 @@ const ReservationDetailPage: React.FC = () => {
 
             {/* PAYMENT */}
 
-            <Section title="Paiement" icon={CreditCard}>
+            <Section title="Paiement" icon="credit-card">
               <div className="flex items-start gap-3">
                 {reservation.paiement_reussi ? (
                   <>
-                    <CheckCircle2
-                      className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400"
-                      aria-hidden="true"
-                    />
+                    <AdminIcon name="check-circle" size={20} className="mt-0.5 shrink-0 text-[#16845B]" />
 
                     <div>
                       <p className="font-semibold text-slate-900 dark:text-white">
@@ -720,10 +679,7 @@ const ReservationDetailPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Clock3
-                      className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400"
-                      aria-hidden="true"
-                    />
+                    <AdminIcon name="clock" size={20} className="mt-0.5 shrink-0 text-[#B7791F]" />
 
                     <div>
                       <p className="font-semibold text-slate-900 dark:text-white">
@@ -742,16 +698,16 @@ const ReservationDetailPage: React.FC = () => {
 
             {/* RESERVATION META */}
 
-            <Section title="Informations" icon={FileText}>
+            <Section title="Informations" icon="file">
               <div className="space-y-5">
                 <InfoItem
-                  icon={FileText}
+                  icon="file"
                   label="Numéro"
                   value={reservation.numero}
                 />
 
                 <InfoItem
-                  icon={FileText}
+                  icon="file"
                   label="Source"
                   value={
                     reservation.source_display ||
@@ -760,7 +716,7 @@ const ReservationDetailPage: React.FC = () => {
                 />
 
                 <InfoItem
-                  icon={Clock3}
+                  icon="clock"
                   label="Créée le"
                   value={formatDateTime(
                     reservation.created_at
@@ -768,7 +724,7 @@ const ReservationDetailPage: React.FC = () => {
                 />
 
                 <InfoItem
-                  icon={Clock3}
+                  icon="clock"
                   label="Mise à jour"
                   value={formatDateTime(
                     reservation.updated_at
@@ -781,10 +737,7 @@ const ReservationDetailPage: React.FC = () => {
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/50">
               <div className="flex items-start gap-3">
-                <ShieldCheck
-                  className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400"
-                  aria-hidden="true"
-                />
+                <AdminIcon name="shield" size={20} className="mt-0.5 shrink-0 text-[#16845B]" />
 
                 <div>
                   <h2 className="text-sm font-semibold text-slate-900 dark:text-white">

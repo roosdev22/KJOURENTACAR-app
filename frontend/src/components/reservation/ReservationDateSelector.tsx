@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays } from "lucide-react";
+import AdminIcon from "../admin/AdminIcon";
 
 // ============================================================
 // TYPES
@@ -21,6 +21,7 @@ interface ReservationDateSelectorProps {
 
 function DateField({
   label,
+  id,
   value,
   onChange,
   min,
@@ -28,6 +29,7 @@ function DateField({
   error,
 }: {
   label: string;
+  id: string;
   value: string;
   onChange: (value: string) => void;
   min?: string;
@@ -40,21 +42,11 @@ function DateField({
     <div className="min-w-0">
       {/* LABEL */}
       <div className="mb-1.5 flex items-center justify-between">
-        <label className="text-[9px] font-bold uppercase tracking-[0.14em] text-neutral-500">
+        <label htmlFor={id} className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#64748B]">
           {label}
         </label>
 
-        <CalendarDays
-          size={12}
-          strokeWidth={1.8}
-          className={
-            error
-              ? "text-red-600"
-              : hasValue
-                ? "text-red-600"
-                : "text-neutral-300"
-          }
-        />
+        <AdminIcon name="calendar-check" size={15} className={error ? "text-[#B4232F]" : "text-[#64748B]"} />
       </div>
 
       {/* INPUT */}
@@ -63,38 +55,31 @@ function DateField({
           "relative flex h-10 items-center overflow-hidden rounded-md border",
           "transition-all duration-200",
           error
-            ? "border-red-200 bg-red-50/30"
+            ? "border-[#B4232F] bg-[#FFF5F6]"
             : hasValue
-              ? "border-neutral-300 bg-white"
-              : "border-neutral-200 bg-neutral-50",
+              ? "border-[#B7C0C7] bg-white"
+              : "border-[#E3E6E8] bg-[#F8F9FA]",
           disabled ? "cursor-not-allowed opacity-60" : "",
         ].join(" ")}
       >
         {/* ICON */}
-        <div className="flex h-full w-9 shrink-0 items-center justify-center border-r border-neutral-200">
-          <CalendarDays
-            size={13}
-            strokeWidth={1.8}
-            className={
-              error
-                ? "text-red-600"
-                : hasValue
-                  ? "text-red-600"
-                  : "text-neutral-400"
-            }
-          />
+        <div className="flex h-full w-10 shrink-0 items-center justify-center border-r border-[#E3E6E8]">
+          <AdminIcon name="calendar-check" size={15} className={error ? "text-[#B4232F]" : "text-[#64748B]"} />
         </div>
 
         {/* INPUT DATE */}
         <input
+          id={id}
           type="date"
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
           value={value}
           min={min}
           disabled={disabled}
           onChange={(event) => onChange(event.target.value)}
           className={[
             "h-full min-w-0 flex-1 appearance-none bg-transparent px-2.5",
-            "text-[11px] font-semibold text-neutral-900",
+            "text-sm font-semibold text-[#202327]",
             "outline-none",
             "disabled:cursor-not-allowed",
             "[color-scheme:light]",
@@ -114,7 +99,7 @@ function DateField({
 
       {/* ERROR */}
       {error && (
-        <p className="mt-1 text-[9px] font-medium leading-3 text-red-600">
+        <p id={`${id}-error`} className="mt-1 text-xs font-medium leading-4 text-[#B4232F]">
           {error}
         </p>
       )}
@@ -139,7 +124,8 @@ export default function ReservationDateSelector({
   const datesComplete = Boolean(dateDebut && dateFin);
 
   return (
-    <section className="w-full max-w-3xl overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+    <section className="w-full border-b border-[#E3E6E8] bg-[#F4F5F6] px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-[#E3E6E8] bg-white shadow-sm">
       {/* ==================================================
           HEADER
       ================================================== */}
@@ -148,19 +134,19 @@ export default function ReservationDateSelector({
         <div className="flex min-w-0 items-center gap-2.5">
           {/* STEP */}
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-neutral-950">
-            <span className="text-[8px] font-black tracking-[0.08em] text-white">
+            <span             className="text-[10px] font-bold tracking-[0.08em] text-white">
               01
             </span>
           </div>
 
           {/* TITLE */}
           <div className="min-w-0">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.14em] text-neutral-950">
+            <h2 className="text-sm font-bold text-[#202327]">
               Dates de location
             </h2>
 
-            <p className="mt-0.5 text-[9px] text-neutral-400">
-              Définissez votre période
+            <p className="mt-0.5 text-xs text-[#64748B]">
+              Choisissez vos dates de départ et de retour
             </p>
           </div>
         </div>
@@ -170,11 +156,11 @@ export default function ReservationDateSelector({
           <span
             className={[
               "h-1.5 w-1.5 rounded-full",
-              datesComplete ? "bg-red-600" : "bg-neutral-300",
+                datesComplete ? "bg-[#16845B]" : "bg-[#B7791F]",
             ].join(" ")}
           />
 
-          <span className="hidden text-[8px] font-bold uppercase tracking-[0.14em] text-neutral-400 sm:block">
+          <span className="hidden text-[10px] font-bold uppercase tracking-[0.1em] text-[#64748B] sm:block">
             {datesComplete ? "Dates définies" : "Étape 1"}
           </span>
         </div>
@@ -191,6 +177,7 @@ export default function ReservationDateSelector({
             {/* START */}
             <DateField
               label="Début de location"
+              id="reservation-date-start"
               value={dateDebut}
               onChange={onDateDebutChange}
               min={minDate}
@@ -201,17 +188,14 @@ export default function ReservationDateSelector({
             {/* ARROW */}
             <div className="hidden h-10 items-center justify-center md:flex">
               <div className="flex h-6 w-6 items-center justify-center rounded-full border border-neutral-200 bg-white">
-                <ArrowRight
-                  size={11}
-                  strokeWidth={1.8}
-                  className="text-neutral-400"
-                />
+                <AdminIcon name="arrow-right" size={14} className="text-[#64748B]" />
               </div>
             </div>
 
             {/* END */}
             <DateField
               label="Fin de location"
+              id="reservation-date-end"
               value={dateFin}
               onChange={onDateFinChange}
               min={dateDebut || minDate}
@@ -224,14 +208,10 @@ export default function ReservationDateSelector({
               INFORMATION
           ================================================== */}
 
-          <div className="mt-3 flex items-center gap-2 border-t border-neutral-100 pt-2.5">
-            <CalendarDays
-              size={11}
-              strokeWidth={1.7}
-              className="shrink-0 text-red-600"
-            />
+          <div className="mt-4 flex items-center gap-2 border-t border-[#E3E6E8] pt-3">
+            <AdminIcon name="info" size={15} className="shrink-0 text-[#B4232F]" />
 
-            <p className="text-[8px] leading-3.5 text-neutral-400">
+            <p className="text-xs leading-5 text-[#64748B]">
               La disponibilité des véhicules sera vérifiée selon cette
               période.
             </p>
@@ -250,6 +230,7 @@ export default function ReservationDateSelector({
           datesComplete ? "w-full" : "w-10",
         ].join(" ")}
       />
+      </div>
     </section>
   );
 }

@@ -1,4 +1,4 @@
-import { FileText, MessageSquareText } from "lucide-react";
+import AdminIcon from "../admin/AdminIcon";
 
 interface ReservationNotesProps {
   value: string;
@@ -32,11 +32,7 @@ export default function ReservationNotes({
           <div className="flex min-w-0 items-start gap-4">
             {/* Icon */}
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[17px] bg-neutral-950 text-white shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
-              <FileText
-                size={19}
-                strokeWidth={1.8}
-                className="relative z-10"
-              />
+              <AdminIcon name="file" size={20} className="relative z-10" />
 
               <div className="absolute inset-0 rounded-[17px] bg-gradient-to-br from-white/10 to-transparent" />
             </div>
@@ -78,11 +74,7 @@ export default function ReservationNotes({
             htmlFor="reservation-notes"
             className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-neutral-700"
           >
-            <MessageSquareText
-              size={13}
-              strokeWidth={2}
-              className="text-neutral-400"
-            />
+            <AdminIcon name="message" size={15} className="text-neutral-400" />
 
             Votre message
           </label>

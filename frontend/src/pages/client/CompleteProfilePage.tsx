@@ -1,18 +1,7 @@
 import { useState, useEffect } from "react";
+import { getApiErrorMessage } from "../../utils/apiError";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  User,
-  Phone,
-  MapPin,
-  Car,
-  CreditCard,
-  CalendarDays,
-  Save,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  ArrowLeft,
-} from "lucide-react";
+import AdminIcon from "../../components/admin/AdminIcon";
 
 import {
   authService,
@@ -506,98 +495,71 @@ export default function CompleteProfilePage() {
           replace: true,
         });
       }, 800);
+    
     } catch (err: unknown) {
-      console.error(
-        "Erreur mise à jour profil :",
-        err
-      );
-
-      // ======================================================
-      // STRUCTURE ERREUR AXIOS / DJANGO
-      // ======================================================
+      console.error("Erreur mise à jour profil.");
 
       const axiosError = err as {
         response?: {
-          status?: number;
-          data?: {
-            detail?: unknown;
-            error?: unknown;
-            [key: string]: unknown;
-          };
+          data?: Record<string, unknown>;
         };
       };
 
-      const data =
-        axiosError.response?.data;
-
-      // ======================================================
-      // ERREURS DJANGO PAR CHAMP
-      // ======================================================
+      const data = axiosError.response?.data;
 
       if (data) {
-        const fieldErrors = Object.entries(data)
-          .filter(
-            ([key]) =>
-              key !== "detail" &&
-              key !== "error"
-          )
-          .map(([field, messages]) => {
-            const label =
-              fieldLabels[field] ?? field;
+        // Erreurs générales de validation envoyées par Django.
+        const nonFieldErrors = data.non_field_errors;
 
-            let message: string;
-
-            if (Array.isArray(messages)) {
-              message = String(messages[0]);
-            } else if (
-              typeof messages === "object" &&
-              messages !== null
-            ) {
-              message = JSON.stringify(messages);
-            } else {
-              message = String(messages);
-            }
-
-            return `${label} : ${message}`;
-          });
-
-        if (fieldErrors.length > 0) {
+        if (Array.isArray(nonFieldErrors)) {
           setError(
-            fieldErrors.join(" — ")
+            nonFieldErrors.map(String).join(" ")
           );
           return;
         }
 
-        // ----------------------------------------------------
-        // ERREUR DETAIL
-        // ----------------------------------------------------
+        // Erreurs propres aux champs : conserver les libellés français.
+        const fieldErrors = Object.entries(data)
+          .filter(
+            ([field, messages]) =>
+              field !== "detail" &&
+              field !== "error" &&
+              field !== "non_field_errors" &&
+              messages !== null &&
+              messages !== undefined
+          )
+          .map(([field, messages]) => {
+            const label = fieldLabels[field] ?? field;
 
-        if (data.detail) {
-          setError(String(data.detail));
-          return;
-        }
+            let message: string;
 
-        // ----------------------------------------------------
-        // ERREUR ERROR
-        // ----------------------------------------------------
+            if (Array.isArray(messages)) {
+              message = messages.map(String).join(" ");
+            } else if (typeof messages === "string") {
+              message = messages;
+            } else {
+              return "";
+            }
 
-        if (data.error) {
-          setError(String(data.error));
+            return `${label} : ${message}`;
+          })
+          .filter(Boolean);
+
+        if (fieldErrors.length > 0) {
+          setError(fieldErrors.join(" — "));
           return;
         }
       }
 
-      // ======================================================
-      // ERREUR PAR DÉFAUT
-      // ======================================================
-
+      // Erreurs générales : réseau, serveur ou réponse API.
       setError(
-        "Impossible de mettre à jour votre profil. " +
-          "Veuillez vérifier les informations saisies."
+        getApiErrorMessage(
+          err,
+          "Impossible de mettre à jour votre profil. Veuillez vérifier les informations saisies."
+        )
       );
-    } finally {
-      setLoading(false);
     }
+
   };
 
   // ==========================================================
@@ -607,10 +569,7 @@ export default function CompleteProfilePage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <Loader2
-          size={28}
-          className="animate-spin text-red-700"
-        />
+        <AdminIcon name="loader" size={28} className="animate-spin text-[#B4232F]" />
       </div>
     );
   }
@@ -635,30 +594,27 @@ export default function CompleteProfilePage() {
   // ==========================================================
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-10 px-6">
-      <div className="w-full max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+    <div className="min-h-screen bg-[#F4F5F6] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="overflow-hidden rounded-2xl border border-[#E3E6E8] bg-white shadow-sm">
 
           {/* ==================================================
               HEADER
           ================================================== */}
 
-          <div className="px-8 pt-8 pb-6 border-b border-gray-200">
+          <div className="border-b border-[#E3E6E8] px-6 pb-6 pt-7 sm:px-8">
             <div className="flex items-center gap-4">
 
-              <div className="w-12 h-12 bg-red-700 rounded-lg flex items-center justify-center shadow-md">
-                <User
-                  size={24}
-                  className="text-white"
-                />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#17191C] shadow-sm">
+                <AdminIcon name="user-round" size={24} className="text-white" />
               </div>
 
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">
+                <h1 className="text-2xl font-bold tracking-tight text-[#202327]">
                   Complétez votre profil
                 </h1>
 
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="mt-1 text-sm text-[#64748B]">
                   {locationState?.reason ===
                   "profile_incomplete"
                     ? "Ces informations sont requises pour effectuer une réservation."
@@ -673,9 +629,9 @@ export default function CompleteProfilePage() {
             ================================================= */}
 
             {missingDocs.length > 0 && (
-              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded text-amber-800 text-sm">
+              <div className="mt-4 rounded-xl border border-[#F2D29B] bg-[#FFF8ED] p-3 text-sm text-[#A2650F]">
 
-                <p className="font-semibold mb-1">
+                <p className="mb-1 font-semibold">
                   Informations manquantes :
                 </p>
 
@@ -705,12 +661,9 @@ export default function CompleteProfilePage() {
             ================================================= */}
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm flex items-start gap-2">
+              <div className="flex items-start gap-2 rounded-xl border border-[#F0B4BC] bg-[#FFF5F6] p-3 text-sm text-[#B4232F]">
 
-                <AlertCircle
-                  size={17}
-                  className="mt-0.5 flex-shrink-0"
-                />
+                <AdminIcon name="alert" size={17} className="mt-0.5 shrink-0" />
 
                 <span>{error}</span>
 
@@ -722,12 +675,9 @@ export default function CompleteProfilePage() {
             ================================================= */}
 
             {success && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded text-green-700 text-sm flex items-start gap-2">
+              <div className="flex items-start gap-2 rounded-xl border border-[#B9E6D0] bg-[#EAF7F0] p-3 text-sm text-[#16845B]">
 
-                <CheckCircle
-                  size={17}
-                  className="mt-0.5 flex-shrink-0"
-                />
+                <AdminIcon name="check-circle" size={17} className="mt-0.5 shrink-0" />
 
                 <span>{success}</span>
 
@@ -739,25 +689,22 @@ export default function CompleteProfilePage() {
             ================================================= */}
 
             <section>
-              <div className="flex items-center gap-2 mb-5">
+              <div className="mb-5 flex items-center gap-2">
 
-                <User
-                  size={18}
-                  className="text-red-700"
-                />
+                <AdminIcon name="user-round" size={18} className="text-[#B4232F]" />
 
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-[#202327]">
                   Informations personnelles
                 </h2>
 
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
                 {/* PRÉNOM */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Prénom
                   </label>
 
@@ -770,14 +717,14 @@ export default function CompleteProfilePage() {
                     disabled={loading}
                     maxLength={150}
                     placeholder="Votre prénom"
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                    className="w-full rounded-xl border border-[#E3E6E8] bg-[#F8F9FA] px-4 py-2.5 text-sm text-[#202327] transition-all placeholder:text-[#64748B] focus:border-[#B4232F] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                   />
                 </div>
 
                 {/* NOM */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Nom
                   </label>
 
@@ -790,23 +737,20 @@ export default function CompleteProfilePage() {
                     disabled={loading}
                     maxLength={150}
                     placeholder="Votre nom"
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                    className="w-full rounded-xl border border-[#E3E6E8] bg-[#F8F9FA] px-4 py-2.5 text-sm text-[#202327] transition-all placeholder:text-[#64748B] focus:border-[#B4232F] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                   />
                 </div>
 
                 {/* TÉLÉPHONE */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Téléphone
                   </label>
 
                   <div className="relative">
 
-                    <Phone
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
-                    />
+                    <AdminIcon name="phone" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
 
                     <input
                       type="tel"
@@ -816,7 +760,7 @@ export default function CompleteProfilePage() {
                       autoComplete="tel"
                       disabled={loading}
                       placeholder="+50912345678"
-                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                      className="w-full rounded-xl border border-[#E3E6E8] bg-[#F8F9FA] py-2.5 pl-10 pr-4 text-sm text-[#202327] transition-all placeholder:text-[#64748B] focus:border-[#B4232F] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                     />
 
                   </div>
@@ -825,16 +769,13 @@ export default function CompleteProfilePage() {
                 {/* ADRESSE */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Adresse
                   </label>
 
                   <div className="relative">
 
-                    <MapPin
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
-                    />
+                    <AdminIcon name="map-pin" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
 
                     <input
                       type="text"
@@ -844,7 +785,7 @@ export default function CompleteProfilePage() {
                       autoComplete="street-address"
                       disabled={loading}
                       placeholder="Votre adresse"
-                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                      className="w-full rounded-xl border border-[#E3E6E8] bg-[#F8F9FA] py-2.5 pl-10 pr-4 text-sm text-[#202327] transition-all placeholder:text-[#64748B] focus:border-[#B4232F] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                     />
 
                   </div>
@@ -857,36 +798,30 @@ export default function CompleteProfilePage() {
                 PERMIS DE CONDUIRE
             ================================================= */}
 
-            <section className="border-t border-gray-200 pt-8">
+            <section className="border-t border-[#E3E6E8] pt-8">
 
-              <div className="flex items-center gap-2 mb-5">
+              <div className="mb-5 flex items-center gap-2">
 
-                <Car
-                  size={18}
-                  className="text-red-700"
-                />
+                <AdminIcon name="car-front" size={18} className="text-[#B4232F]" />
 
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-[#202327]">
                   Permis de conduire
                 </h2>
 
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
                 {/* NUMÉRO PERMIS */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Numéro du permis
                   </label>
 
                   <div className="relative">
 
-                    <CreditCard
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
-                    />
+                    <AdminIcon name="credit-card" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
 
                     <input
                       type="text"
@@ -898,7 +833,7 @@ export default function CompleteProfilePage() {
                       disabled={loading}
                       maxLength={30}
                       placeholder="Numéro du permis"
-                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                      className="w-full rounded-xl border border-[#E3E6E8] bg-[#F8F9FA] py-2.5 pl-10 pr-4 text-sm text-[#202327] transition-all placeholder:text-[#64748B] focus:border-[#B4232F] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                     />
 
                   </div>
@@ -907,16 +842,13 @@ export default function CompleteProfilePage() {
                 {/* EXPIRATION */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Date d'expiration
                   </label>
 
                   <div className="relative">
 
-                    <CalendarDays
-                      size={16}
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
-                    />
+                    <AdminIcon name="calendar-check" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B]" />
 
                     <input
                       type="date"
@@ -926,7 +858,7 @@ export default function CompleteProfilePage() {
                       }
                       onChange={handleChange}
                       disabled={loading}
-                      className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                      className="w-full rounded-xl border border-[#E3E6E8] bg-[#F8F9FA] py-2.5 pl-10 pr-4 text-sm text-[#202327] transition-all focus:border-[#B4232F] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                     />
 
                   </div>
@@ -939,27 +871,24 @@ export default function CompleteProfilePage() {
                 PIÈCE D'IDENTITÉ
             ================================================= */}
 
-            <section className="border-t border-gray-200 pt-8">
+            <section className="border-t border-[#E3E6E8] pt-8">
 
-              <div className="flex items-center gap-2 mb-5">
+              <div className="mb-5 flex items-center gap-2">
 
-                <CreditCard
-                  size={18}
-                  className="text-red-700"
-                />
+                <AdminIcon name="credit-card" size={18} className="text-[#B4232F]" />
 
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-[#202327]">
                   Pièce d'identité
                 </h2>
 
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
                 {/* TYPE */}
 
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <label className="mb-2 block text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                     Type de pièce
                   </label>
 
@@ -968,7 +897,7 @@ export default function CompleteProfilePage() {
                     value={formData.id_document_type}
                     onChange={handleChange}
                     disabled={loading}
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded bg-white transition-all focus:outline-none focus:border-red-700 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100"
+                    className="w-full rounded-xl border border-[#E3E6E8] bg-white px-4 py-2.5 text-sm text-[#202327] transition-all focus:border-[#B4232F] focus:outline-none focus:ring-4 focus:ring-[#B4232F]/10 disabled:bg-[#EEF1F3]"
                   >
 
                     <option value="">
@@ -1050,7 +979,7 @@ export default function CompleteProfilePage() {
                 className="inline-flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded hover:border-gray-400 transition-all disabled:opacity-50"
               >
 
-                <ArrowLeft size={16} />
+                <AdminIcon name="arrow-left" size={16} />
 
                 Retour
 
@@ -1066,16 +995,13 @@ export default function CompleteProfilePage() {
 
                 {loading ? (
                   <>
-                    <Loader2
-                      size={17}
-                      className="animate-spin"
-                    />
+                    <AdminIcon name="loader" size={17} className="animate-spin" />
 
                     Enregistrement...
                   </>
                 ) : (
                   <>
-                    <Save size={17} />
+                    <AdminIcon name="save" size={17} />
 
                     Enregistrer mon profil
                   </>

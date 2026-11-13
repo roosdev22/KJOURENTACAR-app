@@ -1,200 +1,130 @@
-import {
-  CalendarDays,
-  Clock3,
-  MapPin,
-  ChevronRight,
-} from "lucide-react";
+import type { UpcomingRental } from "../../../api/services/adminDashboardService";
+import AdminIcon from "../AdminIcon";
 
-const rentals = [
-  {
-    client: "Jean Pierre",
-    vehicle: "Toyota RAV4",
-    date: "Aujourd'hui",
-    time: "14:00",
-    location: "Port-au-Prince",
-  },
-  {
-    client: "Marie Louis",
-    vehicle: "Hyundai Tucson",
-    date: "Demain",
-    time: "09:30",
-    location: "Pétion-Ville",
-  },
-  {
-    client: "David Charles",
-    vehicle: "Kia Sportage",
-    date: "15 août",
-    time: "11:00",
-    location: "Delmas",
-  },
-];
+interface UpcomingRentalsProps {
+  rentals: UpcomingRental[];
+  loading?: boolean;
+  onViewAll?: () => void;
+}
 
-export default function UpcomingRentals() {
+function formatDate(value: string): string {
+  const date = new Date(`${value}T12:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+export default function UpcomingRentals({
+  rentals,
+  loading = false,
+  onViewAll,
+}: UpcomingRentalsProps) {
   return (
-    <section
-      className="
-        bg-white
-        border border-gray-200
-        rounded-xl
-        shadow-sm
-        p-4
-        sm:p-5
-      "
-    >
-      {/* En-tête */}
-      <div className="flex items-center justify-between mb-4">
+    <section className="rounded-kjou-card border border-kjou-border bg-white p-4 sm:p-5">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm sm:text-base font-semibold text-gray-900">
+          <h2 className="font-kjou-display text-sm font-bold text-kjou-text sm:text-base">
             Prochaines locations
           </h2>
 
-          <p className="mt-1 text-xs text-gray-500">
-            Les prochaines prises en charge
+          <p className="mt-1 text-xs text-kjou-muted">
+            Réservations confirmées à venir
           </p>
         </div>
 
-        <button
-          type="button"
-          className="
-            text-xs
-            font-semibold
-            text-red-700
-            hover:text-red-800
-            transition-colors
-          "
-        >
-          Voir tout
-        </button>
-      </div>
-
-      {/* Liste des locations */}
-      <div className="divide-y divide-gray-100">
-        {rentals.map((rental) => (
+        {onViewAll && (
           <button
-            key={`${rental.client}-${rental.time}`}
             type="button"
-            className="
-              group
-              w-full
-              flex
-              items-center
-              gap-3
-              px-2
-              py-3
-              rounded-lg
-              text-left
-              transition-colors
-              hover:bg-gray-50
-            "
+            onClick={onViewAll}
+            className="shrink-0 text-xs font-semibold text-kjou-red transition-colors hover:text-kjou-red-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kjou-red focus-visible:ring-offset-2"
           >
-            {/* Icône */}
-            <div
-              className="
-                shrink-0
-                w-9
-                h-9
-                rounded-lg
-                bg-gray-100
-                text-gray-600
-                flex
-                items-center
-                justify-center
-                transition-colors
-                group-hover:bg-red-50
-                group-hover:text-red-700
-              "
-            >
-              <CalendarDays size={16} />
-            </div>
-
-            {/* Informations client */}
-            <div className="flex-1 min-w-0">
-              <p
-                className="
-                  text-sm
-                  font-semibold
-                  text-gray-900
-                  truncate
-                "
-              >
-                {rental.client}
-              </p>
-
-              <p
-                className="
-                  mt-0.5
-                  text-xs
-                  text-gray-500
-                  truncate
-                "
-              >
-                {rental.vehicle}
-              </p>
-            </div>
-
-            {/* Date et localisation */}
-            <div className="hidden sm:block text-right shrink-0">
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-end
-                  gap-1.5
-                  text-xs
-                  font-medium
-                  text-gray-600
-                "
-              >
-                <Clock3
-                  size={13}
-                  className="text-gray-400"
-                />
-
-                <span>
-                  {rental.date} · {rental.time}
-                </span>
-              </div>
-
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-end
-                  gap-1.5
-                  mt-1
-                  text-[11px]
-                  text-gray-400
-                "
-              >
-                <MapPin size={12} />
-
-                <span>
-                  {rental.location}
-                </span>
-              </div>
-            </div>
-
-            {/* Indicateur */}
-            <div
-              className="
-                shrink-0
-                w-7
-                h-7
-                rounded-full
-                flex
-                items-center
-                justify-center
-                text-gray-300
-                transition-all
-                group-hover:bg-red-50
-                group-hover:text-red-700
-              "
-            >
-              <ChevronRight size={16} />
-            </div>
+            Voir tout
           </button>
-        ))}
+        )}
       </div>
+
+      {loading ? (
+        <div className="space-y-4 py-2" aria-live="polite">
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="flex animate-pulse items-center gap-3">
+              <div className="h-9 w-9 rounded-lg bg-gray-100" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-2/3 rounded bg-gray-100" />
+                <div className="h-3 w-1/2 rounded bg-gray-100" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : rentals.length === 0 ? (
+        <div className="py-8 text-center">
+          <AdminIcon
+            name="reservation"
+            className="mx-auto mb-2 text-kjou-muted"
+            size={28}
+          />
+
+          <p className="text-sm font-semibold text-kjou-text">
+            Aucune location à venir
+          </p>
+
+          <p className="mt-1 text-xs text-kjou-muted">
+            Les prochaines réservations confirmées apparaîtront ici.
+          </p>
+        </div>
+      ) : (
+        <div className="divide-y divide-gray-100">
+          {rentals.map((rental) => (
+            <div
+              key={rental.id}
+              className="flex items-center gap-3 border-t border-kjou-border px-2 py-3 first:border-t-0"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-kjou-mist text-kjou-carbon">
+                <AdminIcon name="car-front" size={17} />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-kjou-text">
+                  {rental.client}
+                </p>
+
+                <p className="mt-0.5 truncate text-xs text-kjou-muted">
+                  {rental.vehicles.length > 0
+                    ? rental.vehicles.join(", ")
+                    : "Véhicule non renseigné"}
+                </p>
+
+                <p className="mt-1 text-[11px] text-kjou-muted">
+                  Réservation {rental.numero}
+                </p>
+              </div>
+
+              <div className="shrink-0 text-right">
+                <div className="flex items-center justify-end gap-1.5 text-xs font-medium text-kjou-text">
+                  <AdminIcon name="clock" size={13} className="text-kjou-muted" />
+                  <span>{formatDate(rental.date_debut)}</span>
+                </div>
+
+                <p className="mt-1 text-[11px] text-kjou-muted">
+                  Jusqu’au {formatDate(rental.date_fin)}
+                </p>
+              </div>
+
+              <AdminIcon
+                name="chevron-right"
+                size={16}
+                className="shrink-0 text-kjou-muted"
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

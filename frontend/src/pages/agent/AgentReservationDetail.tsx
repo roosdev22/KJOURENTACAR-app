@@ -32,6 +32,8 @@ const STATUS_LABELS: Record<ReservationStatus, string> = {
   CANCELLED: "Annulée",
   EN_COURS: "En cours",
   TERMINEE: "Terminée",
+  EXPIRED: "Expirée",
+
 };
 
 function formatDate(value: string | null) {
@@ -476,7 +478,7 @@ export default function AgentReservationDetail() {
   // ==========================================================
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-slate-50">
+    <div className="min-h-[calc(100vh-64px)] bg-[#F4F5F6]">
       <main className="mx-auto max-w-[1400px] px-4 py-5 sm:px-6 lg:px-8">
 
         {/* ====================================================
@@ -489,26 +491,27 @@ export default function AgentReservationDetail() {
             onClick={() =>
               navigate("/agent/reservations")
             }
-            className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-red-600"
+            className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition hover:text-[#B4232F]"
           >
             <ArrowLeft size={16} />
             Retour aux réservations
           </button>
 
-          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <div className="h-7 w-1 rounded-full bg-red-600" />
+          <div className="rounded-2xl border border-[#E3E6E8] bg-white p-5 shadow-sm">
+            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="h-7 w-1 rounded-full bg-[#B4232F]" />
 
-                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-red-600">
-                  Détail réservation
-                </span>
-              </div>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4232F]">
+                    Détail réservation
+                  </span>
+                </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-                  {reservation.numero}
-                </h1>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+                    {reservation.numero}
+                  </h1>
 
                 <StatusBadge
                   status={reservation.statut}
@@ -602,6 +605,7 @@ export default function AgentReservationDetail() {
               )}
             </div>
           </div>
+        </div>
         </div>
 
         {/* ====================================================

@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
 import { authService } from "../../api/services/authService";
-import type { AxiosError } from "axios";
-
+import { getApiErrorMessage } from "../../utils/apiError";
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -35,16 +34,16 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setEmail("");
     setTimeout(() => navigate("/login"), 3000);
 
-  } catch (err) {
-    const axiosError = err as AxiosError;
-    if (!axiosError.response) {
-      setError("Impossible de joindre le serveur. Vérifiez votre connexion.");
-    } else {
-      setError("Erreur lors de l'envoi. Veuillez réessayer.");
-    }
-  } finally {
-    setLoading(false);
-  }
+  } catch (err: unknown) {
+  setError(
+    getApiErrorMessage(
+      err,
+      "Impossible d'envoyer le lien de réinitialisation. Veuillez réessayer."
+    )
+  );
+} finally {
+  setLoading(false);
+}
 };
 
   return (
@@ -92,7 +91,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 </div>
                 <h3 className="font-semibold text-green-900 mb-2">Email envoyé avec succès!</h3>
                 <p className="text-sm text-green-700 mb-4">
-                  Vérifiez votre boîte mail pour le lien de réinitialisation. Il expirera dans 1 heure.
+                  Vérifiez votre boîte mail pour le lien de réinitialisation. Il expirera dans 24 heures.
                 </p>
                 <p className="text-xs text-green-600">
                   Redirection vers la connexion dans quelques secondes...

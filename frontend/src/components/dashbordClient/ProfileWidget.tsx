@@ -64,7 +64,7 @@ export default function ProfileWidget({
       {/* Profil incomplet */}
       {!isComplete && (
         <Link
-          to="/profil/completer"
+          to="/profile/complete"
           className="block rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-center text-xs font-semibold text-red-600 transition-colors hover:bg-red-100"
         >
           Compléter mon profil

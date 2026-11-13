@@ -34,6 +34,10 @@ import type {
 type PaymentFilter = "ALL" | "WITH_PAYMENT" | "WITHOUT_PAYMENT";
 type StatusFilter = "ALL" | ReservationStatus;
 
+interface AgentReservationsProps {
+  navigationContext: "admin" | "agent";
+}
+
 const STATUS_LABELS: Record<ReservationStatus, string> = {
   PENDING_VERIFICATION: "À valider",
   CONFIRMED: "Confirmée",
@@ -167,7 +171,9 @@ function PaymentBadge({
 // PAGE
 // ============================================================
 
-export default function AgentReservations() {
+export default function AgentReservations({
+  navigationContext,
+}: AgentReservationsProps) {
   const navigate = useNavigate();
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -347,7 +353,14 @@ export default function AgentReservations() {
 // ACCÉDER AU PAIEMENT DE LA RÉSERVATION
 // ==========================================================
   const handlePaymentReservation = (reservationId: string) => {
-    navigate(`/agent/paiements?reservation=${reservationId}`);
+  const paymentPath =
+    navigationContext === "admin"
+      ? "/admin/payments"
+      : "/agent/paiements";
+
+  navigate(
+    `${paymentPath}?reservation=${encodeURIComponent(reservationId)}`
+  );
   };
 
   
@@ -527,7 +540,9 @@ const handleConfirmReservation = async (
               <div className="h-7 w-1 rounded-full bg-red-600" />
 
               <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-red-600">
-                Espace agent
+                {navigationContext === "admin"
+                  ? "Espace administrateur"
+                  : "Espace agent"}
               </span>
             </div>
 
@@ -559,17 +574,29 @@ const handleConfirmReservation = async (
               Actualiser
             </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                navigate("/agent/reservations/create")
-              }
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
-            >
-              Nouvelle réservation
-            </button>
+            {navigationContext === "agent" && (
+              <button
+                type="button"
+                onClick={() =>
+                  navigate("/agent/reservations/create")
+                }
+                className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
+              >
+                Nouvelle réservation
+              </button>
+            )}
           </div>
         </div>
+
+        {navigationContext === "admin" && (
+          <p
+            role="status"
+            className="mb-4 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"
+          >
+            La création et le détail individuel des réservations ne
+            disposent pas de routes dédiées dans l’espace Admin.
+          </p>
+        )}
 
         {/* ====================================================
             MESSAGE ERREUR CONFIRMATION
@@ -1095,18 +1122,20 @@ const handleConfirmReservation = async (
                                         </>
                                       )}
 
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    navigate(
-                                      `/agent/reservations/${reservation.id}`
-                                    )
-                                  }
-                                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                                  title="Voir le détail"
-                                >
-                                  <Eye size={16} />
-                                </button>
+                                {navigationContext === "agent" && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      navigate(
+                                        `/agent/reservations/${reservation.id}`
+                                      )
+                                    }
+                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                                    title="Voir le détail"
+                                  >
+                                    <Eye size={16} />
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>

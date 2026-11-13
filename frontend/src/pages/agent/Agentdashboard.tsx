@@ -506,6 +506,82 @@ export default function AgentDashboard() {
         </div>
       )}
 
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_360px]">
+        <div className="rounded-2xl border border-[#E3E6E8] bg-white p-5 shadow-[0_10px_30px_rgba(23,25,28,0.04)]">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#64748B]">
+                Pilotage du jour
+              </p>
+              <h2 className="mt-1 text-lg font-bold text-[#202327]">
+                Réservations à traiter
+              </h2>
+            </div>
+
+            <span className="inline-flex rounded-full bg-[#B4232F]/10 px-2.5 py-1 text-xs font-semibold text-[#B4232F]">
+              {pendingReservations.length} prioritaire{pendingReservations.length > 1 ? "s" : ""}
+            </span>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center justify-between rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] px-3 py-2.5">
+              <span className="text-sm text-[#64748B]">Réservations en attente</span>
+              <span className="text-base font-bold text-[#202327]">{pendingReservations.length}</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] px-3 py-2.5">
+              <span className="text-sm text-[#64748B]">Locations confirmées</span>
+              <span className="text-base font-bold text-[#202327]">{reservationStats.confirmed}</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-[#E3E6E8] bg-[#F4F5F6] px-3 py-2.5">
+              <span className="text-sm text-[#64748B]">Véhicules en cours</span>
+              <span className="text-base font-bold text-[#202327]">{reservationStats.ongoing}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#E3E6E8] bg-[#17191C] p-5 text-white shadow-[0_10px_30px_rgba(23,25,28,0.12)]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">
+            Actions rapides
+          </p>
+          <h2 className="mt-1 text-lg font-bold text-white">Opérations</h2>
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+            <button
+              type="button"
+              onClick={() => navigate("/agent/reservations")}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:bg-white/10"
+            >
+              <span className="text-sm font-medium text-white">Voir les réservations</span>
+              <span className="text-lg text-[#B4232F]">→</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/agent/vehicles")}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:bg-white/10"
+            >
+              <span className="text-sm font-medium text-white">Voir le parc</span>
+              <span className="text-lg text-[#B4232F]">→</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/agent/clients")}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:bg-white/10"
+            >
+              <span className="text-sm font-medium text-white">Clients</span>
+              <span className="text-lg text-[#B4232F]">→</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/agent/locations")}
+              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-left transition hover:bg-white/10"
+            >
+              <span className="text-sm font-medium text-white">Locations</span>
+              <span className="text-lg text-[#B4232F]">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* ======================================================
           STATISTIQUES
       ====================================================== */}

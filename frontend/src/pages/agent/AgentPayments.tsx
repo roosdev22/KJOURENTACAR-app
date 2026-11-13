@@ -13,7 +13,10 @@ import {
   WalletCards,
   XCircle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import axios from "axios";
 
 import { reservationService } from "../../api/services/reservationService";
@@ -32,6 +35,10 @@ type PaymentForm = {
   reference: string;
   notes: string;
 };
+
+interface AgentPaymentsProps {
+  navigationContext: "admin" | "agent";
+}
 
 const PAGE_SIZE = 8;
 
@@ -381,8 +388,12 @@ function ConfirmationCondition({
   );
 }
 
-export default function AgentPayments() {
+export default function AgentPayments({
+  navigationContext,
+}: AgentPaymentsProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedReservationId = searchParams.get("reservation");
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedReservationId, setSelectedReservationId] = useState<
@@ -426,7 +437,21 @@ export default function AgentPayments() {
 
         setReservations(data);
 
-        if (data.length > 0) {
+        if (requestedReservationId) {
+          const requestedReservation = data.find(
+            (reservation) =>
+              reservation.id === requestedReservationId,
+          );
+
+          if (requestedReservation) {
+            setSelectedReservationId(requestedReservation.id);
+          } else {
+            setSelectedReservationId(null);
+            setError(
+              "La réservation demandée n’est pas disponible dans la liste.",
+            );
+          }
+        } else if (data.length > 0) {
           setSelectedReservationId(
             (current) => current ?? data[0].id,
           );
@@ -449,7 +474,7 @@ export default function AgentPayments() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [requestedReservationId]);
 
   const selectedReservation = useMemo(
     () =>
@@ -1096,17 +1121,27 @@ export default function AgentPayments() {
                       </p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(
-                          `/agent/reservations/${selectedReservation.id}`,
-                        )
-                      }
-                      className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                    >
-                      Voir la réservation
-                    </button>
+                    {navigationContext === "agent" ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/agent/reservations/${selectedReservation.id}`,
+                          )
+                        }
+                        className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        Voir la réservation
+                      </button>
+                    ) : (
+                      <p
+                        role="status"
+                        className="text-sm text-slate-500"
+                      >
+                        Le détail de la réservation n’a pas de route Admin
+                        dédiée.
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">

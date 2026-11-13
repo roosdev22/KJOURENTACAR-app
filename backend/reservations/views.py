@@ -321,9 +321,16 @@ class ReservationViewSet(viewsets.ModelViewSet):
             },
         )
 
-        serializer.is_valid(
-            raise_exception=True,
-        )
+        if not serializer.is_valid():
+            logger.warning(
+                "Échec création réservation | rôle=%s | erreurs=%s",
+                user.role,
+                serializer.errors,
+            )
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         reservation = serializer.save()
 

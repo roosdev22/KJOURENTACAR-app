@@ -43,7 +43,7 @@ export default function GoogleCallback() {
       .catch(() => {
         navigate("/login?error=google_failed");
       });
-  }, []);
+  }, [login, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 gap-4">

@@ -3,14 +3,9 @@ import {
   useEffect,
   useState,
 } from "react";
-import { AxiosError } from "axios";
 
-import {
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  X,
-} from "lucide-react";
+import { getApiErrorMessage } from "../../utils/apiError";
+import AdminIcon from "../../components/admin/AdminIcon";
 
 import { adminService } from "../../api/services/adminService";
 
@@ -438,20 +433,16 @@ const handleCreateUser = async (
       await loadUsers();
     }
 
-  } catch (err) {
+  } catch (err: unknown) {
 
-    console.error("Erreur création utilisateur :", err);
+    console.error("Erreur création utilisateur.");
 
-    // ← remplace l'ancien catch par ceci
-    if (err instanceof AxiosError && err.response?.data) {
-      console.error(
-        "Détail backend :",
-        JSON.stringify(err.response.data, null, 2)
-      );
-      setError(JSON.stringify(err.response.data));
-    } else {
-      setError("Impossible de créer l'utilisateur.");
-    }
+    setError(
+      getApiErrorMessage(
+        err,
+        "Impossible de créer l'utilisateur. Vérifiez les informations saisies."
+      )
+    );
 
   } finally {
     setCreating(false);
@@ -720,15 +711,7 @@ const handleCreateUser = async (
 
   return (
 
-    <div
-      className="
-        min-h-screen
-        bg-[#f8f8f8]
-        p-4
-        md:p-6
-        lg:p-8
-      "
-    >
+    <div className="space-y-5">
 
       {/* ======================================================
           HEADER
@@ -742,30 +725,19 @@ const handleCreateUser = async (
           md:flex-row
           md:items-center
           md:justify-between
-          mb-6
         "
       >
 
         <div>
 
-          <h1
-            className="
-              text-2xl
-              md:text-3xl
-              font-bold
-              text-black
-            "
-          >
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-kjou-red">
+          Administration / Comptes
+          </div>
+          <h1 className="font-kjou-display text-2xl font-bold tracking-tight text-kjou-text md:text-[30px]">
             Gestion des utilisateurs
           </h1>
 
-          <p
-            className="
-              text-sm
-              text-black/50
-              mt-1
-            "
-          >
+          <p className="mt-1 text-sm text-kjou-muted">
             Gérez les comptes, rôles et
             accès des utilisateurs.
           </p>
@@ -778,24 +750,10 @@ const handleCreateUser = async (
           onClick={() =>
             setShowCreateModal(true)
           }
-          className="
-            flex
-            items-center
-            justify-center
-            gap-2
-            px-4
-            py-2.5
-            rounded-lg
-            bg-red-700
-            text-white
-            text-sm
-            font-semibold
-            hover:bg-red-800
-            transition
-          "
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-kjou-control bg-kjou-red px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-kjou-red-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kjou-red focus-visible:ring-offset-2"
         >
 
-          <Plus size={18} />
+          <AdminIcon name="plus" size={18} />
 
           Ajouter un utilisateur
 
@@ -812,8 +770,7 @@ const handleCreateUser = async (
 
         <div
           className="
-            mb-5
-            rounded-lg
+            rounded-kjou-control
             border
             border-red-200
             bg-red-50
@@ -821,9 +778,7 @@ const handleCreateUser = async (
             py-3
             text-sm
             text-red-700
-            flex
-            items-center
-            justify-between
+            flex items-center justify-between
           "
         >
 
@@ -844,7 +799,7 @@ const handleCreateUser = async (
             aria-label="Fermer"
           >
 
-            <X size={16} />
+            <AdminIcon name="x" size={16} />
 
           </button>
 
@@ -936,7 +891,7 @@ const handleCreateUser = async (
           <p
             className="
               text-xs
-              text-black/40
+              text-kjou-muted
             "
           >
 
@@ -965,19 +920,22 @@ const handleCreateUser = async (
               }
               className="
                 p-2
-                rounded-lg
+                rounded-kjou-control
                 border
-                border-black/10
+                border-kjou-border
                 bg-white
                 disabled:opacity-30
                 disabled:cursor-not-allowed
-                hover:bg-black/5
+                hover:bg-kjou-mist
                 transition
+                focus-visible:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-kjou-red
               "
               aria-label="Page précédente"
             >
 
-              <ChevronLeft size={16} />
+              <AdminIcon name="chevron-left" size={16} />
 
             </button>
 
@@ -1026,7 +984,7 @@ const handleCreateUser = async (
               aria-label="Page suivante"
             >
 
-              <ChevronRight size={16} />
+              <AdminIcon name="chevron-right" size={16} />
 
             </button>
 

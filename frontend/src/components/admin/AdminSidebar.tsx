@@ -1,330 +1,186 @@
 import { useState } from "react";
-import {
-  LayoutDashboard,
-  CalendarDays,
-  KeyRound,
-  Car,
-  CreditCard,
-  FileText,
-  Receipt,
-  Users,
-  Wrench,
-  BarChart3,
-  Bell,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import AdminIcon, { type AdminIconName } from "./AdminIcon";
 
-const menuSections = [
+const menuSections: {
+  title: string;
+  items: { label: string; href: string; icon: AdminIconName }[];
+}[] = [
   {
-    title: "OPÉRATIONNEL",
+    title: "OPÉRATIONS",
     items: [
-      {
-        label: "Dashboard",
-        href: "/admin",
-        icon: LayoutDashboard,
-      },
-      {
-        label: "Réservations",
-        href: "/admin/reservations",
-        icon: CalendarDays,
-      },
-      {
-        label: "Locations",
-        href: "/admin/locations",
-        icon: KeyRound,
-      },
-      {
-        label: "Véhicules",
-        href: "/admin/vehicles",
-        icon: Car,
-      },
+      { label: "Tableau de bord", href: "/admin", icon: "dashboard" },
+      { label: "Réservations", href: "/admin/reservations", icon: "reservation" },
+      { label: "Locations", href: "/admin/locations", icon: "rental" },
+      { label: "Véhicules", href: "/admin/vehicles", icon: "vehicle" },
     ],
   },
   {
-    title: "FINANCIER",
+    title: "FINANCES",
     items: [
-      {
-        label: "Paiements",
-        href: "/admin/payments",
-        icon: CreditCard,
-      },
-      {
-        label: "Contrats",
-        href: "/admin/contracts",
-        icon: FileText,
-      },
-      {
-        label: "Factures",
-        href: "/admin/invoices",
-        icon: Receipt,
-      },
+      { label: "Paiements", href: "/admin/payments", icon: "payment" },
+      { label: "Contrats", href: "/admin/contracts", icon: "contract" },
+      { label: "Factures", href: "/admin/facturation", icon: "invoice" },
     ],
   },
   {
-    title: "CLIENTS & MAINTENANCE",
+    title: "ADMINISTRATION",
     items: [
-      {
-        label: "Utilisateurs",
-        href: "/admin/users",
-        icon: Users,
-      },
-      {
-        label: "Maintenance",
-        href: "/admin/maintenance",
-        icon: Wrench,
-      },
-    ],
-  },
-  {
-    title: "SYSTÈME",
-    items: [
-      {
-        label: "Rapports",
-        href: "/admin/reports",
-        icon: BarChart3,
-      },
-      {
-        label: "Notifications",
-        href: "/admin/notifications",
-        icon: Bell,
-      },
-      {
-        label: "Paramètres",
-        href: "/admin/settings",
-        icon: Settings,
-      },
+      { label: "Utilisateurs", href: "/admin/users", icon: "users" },
+      { label: "Maintenance", href: "/admin/maintenance", icon: "maintenance" },
+      { label: "Rapports", href: "/admin/reports", icon: "reports" },
+      { label: "Notifications", href: "/admin/notifications", icon: "notifications" },
+      { label: "Paramètres", href: "/admin/settings", icon: "settings" },
     ],
   },
 ];
 
 export default function AdminSidebar() {
   const { logout } = useAuth();
-
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
-  const closeMobile = () => {
-    setMobileOpen(false);
-  };
+  const closeMobile = () => setMobileOpen(false);
 
   return (
     <>
-      {/* =========================
-          MOBILE HEADER
-      ========================== */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-white border-b border-black/10 flex items-center justify-between px-4">
+      <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-kjou-carbon px-4 text-white lg:hidden">
         <button
+          type="button"
           onClick={() => setMobileOpen(true)}
-          className="p-2 rounded-lg hover:bg-black/5 transition"
-          aria-label="Ouvrir le menu"
+          aria-label="Ouvrir le menu d’administration"
+          aria-expanded={mobileOpen}
+          aria-controls="admin-navigation"
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
-          <Menu size={22} />
+          <AdminIcon name="menu" size={22} />
         </button>
-
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-red-700 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
-          </div>
-
-          <span className="font-bold text-sm">SYGESKAR</span>
+        <div className="text-center">
+          <p className="font-kjou-display text-sm font-bold tracking-wide">
+            K-JOU
+          </p>
+          <p className="text-[10px] tracking-[0.12em] text-white/60">
+            RENT A CAR
+          </p>
         </div>
-
-        <div className="w-8" />
+        <span className="h-10 w-10" aria-hidden="true" />
       </header>
 
-      {/* =========================
-          MOBILE OVERLAY
-      ========================== */}
       {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px]"
+        <button
+          type="button"
+          aria-label="Fermer le menu d’administration"
           onClick={closeMobile}
+          className="fixed inset-0 z-40 cursor-default bg-black/50 lg:hidden"
         />
       )}
 
-      {/* =========================
-          SIDEBAR
-      ========================== */}
       <aside
-        className={`
-          fixed lg:sticky
-          top-0 left-0
-          z-50
-          h-screen
-          bg-white
-          border-r border-black/10
-          flex flex-col
-          transition-all duration-300
-          
-          ${collapsed ? "lg:w-20" : "lg:w-64"}
-          
-          w-64
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0
-        `}
+        id="admin-navigation"
+        aria-label="Navigation administrateur"
+        className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-72 flex-col border-r border-white/10 bg-kjou-carbon text-white transition-transform duration-200 lg:sticky lg:z-auto lg:h-screen lg:shrink-0 lg:translate-x-0 ${
+          collapsed ? "lg:w-20" : "lg:w-64"
+        } ${
+          mobileOpen
+            ? "visible translate-x-0"
+            : "invisible -translate-x-full lg:visible"
+        }`}
       >
-        {/* =========================
-            LOGO
-        ========================== */}
-        <div
-          className={`
-            h-20
-            flex
-            items-center
-            border-b border-black/5
-            ${collapsed ? "lg:justify-center px-3" : "px-5"}
-          `}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 shrink-0 bg-red-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">K</span>
+        <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-white/10 px-5">
+          <div className={`flex min-w-0 items-center gap-3 ${collapsed ? "lg:justify-center" : ""}`}>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-white/15 bg-white/5 font-kjou-display text-sm font-extrabold text-white">
+              KJ
             </div>
-
             <div className={collapsed ? "lg:hidden" : ""}>
-              <span className="block font-bold text-black text-sm">
-                SYGESKAR
-              </span>
-
-              <span className="block text-[11px] text-black/40">
+              <p className="font-kjou-display text-sm font-bold tracking-wide">
+                K-JOU RENT A CAR
+              </p>
+              <p className="mt-0.5 text-[11px] text-white/50">
                 Administration
-              </span>
+              </p>
             </div>
           </div>
 
-          {/* MOBILE CLOSE */}
           <button
+            type="button"
             onClick={closeMobile}
-            className="lg:hidden ml-auto p-2 rounded-lg hover:bg-black/5"
             aria-label="Fermer le menu"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-white/65 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white lg:hidden"
           >
-            <X size={20} />
+            <AdminIcon name="close" size={19} />
           </button>
         </div>
 
-        {/* =========================
-            NAVIGATION
-        ========================== */}
-        <nav className="flex-1 overflow-y-auto px-3 py-5">
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
           {menuSections.map((section) => (
-            <div key={section.title} className="mb-6">
-              {/* Section title */}
+            <div key={section.title}>
               <p
-                className={`
-                  px-3 mb-2
-                  text-[10px]
-                  font-bold
-                  tracking-wider
-                  text-black/40
-                  ${collapsed ? "lg:hidden" : ""}
-                `}
+                className={`mb-2 px-3 text-[10px] font-semibold tracking-[0.14em] text-white/40 ${
+                  collapsed ? "lg:hidden" : ""
+                }`}
               >
                 {section.title}
               </p>
-
               <div className="space-y-1">
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <NavLink
-                      key={item.href}
-                      to={item.href}
-                      end={item.href === "/admin"}
-                      onClick={closeMobile}
-                      title={collapsed ? item.label : undefined}
-                      className={({ isActive }) =>
-                        `
-                        flex items-center
-                        gap-3
-                        px-3 py-2.5
-                        rounded-lg
-                        text-sm
-                        transition-colors
-                        ${
-                          isActive
-                            ? "bg-red-50 text-red-700 font-semibold"
-                            : "text-black/65 hover:bg-black/5 hover:text-black font-medium"
-                        }
-                        ${collapsed ? "lg:justify-center" : ""}
-                        `
-                      }
-                    >
-                      <Icon size={18} strokeWidth={1.8} />
-
-                      <span className={collapsed ? "lg:hidden" : ""}>
-                        {item.label}
-                      </span>
-                    </NavLink>
-                  );
-                })}
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    to={item.href}
+                    end={item.href === "/admin"}
+                    onClick={closeMobile}
+                    title={collapsed ? item.label : undefined}
+                    className={({ isActive }) =>
+                      `relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 ${
+                        isActive
+                          ? "bg-white/10 font-semibold text-white before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-kjou-red"
+                          : "font-medium text-white/65 hover:bg-white/[0.06] hover:text-white"
+                      } ${collapsed ? "lg:justify-center lg:px-0" : ""}`
+                    }
+                  >
+                    <AdminIcon name={item.icon} size={18} />
+                    <span className={collapsed ? "lg:hidden" : ""}>
+                      {item.label}
+                    </span>
+                  </NavLink>
+                ))}
               </div>
             </div>
           ))}
         </nav>
 
-        {/* =========================
-            COLLAPSE BUTTON
-        ========================== */}
-        <div className="hidden lg:block px-3 pb-2">
+        <div className="hidden shrink-0 px-3 pb-2 lg:block">
           <button
+            type="button"
             onClick={() => setCollapsed((value) => !value)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-black/50 hover:bg-black/5 hover:text-black transition"
-            title={collapsed ? "Agrandir le menu" : "Réduire le menu"}
+            aria-label={collapsed ? "Agrandir le menu" : "Réduire le menu"}
+            aria-expanded={!collapsed}
+            className="flex min-h-10 w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-white/55 transition hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           >
-            {collapsed ? (
-              <ChevronRight size={18} />
-            ) : (
-              <>
-                <ChevronLeft size={18} />
-                <span className="text-xs">Réduire le menu</span>
-              </>
-            )}
+            <AdminIcon
+              name={collapsed ? "chevron-right" : "chevron-left"}
+              size={17}
+            />
+            {!collapsed && <span className="text-xs">Réduire le menu</span>}
           </button>
         </div>
 
-        {/* =========================
-            LOGOUT
-        ========================== */}
-        <div className="p-3 border-t border-black/5">
+        <div className="shrink-0 border-t border-white/10 p-3">
           <button
+            type="button"
             onClick={logout}
-            className={`
-              w-full
-              flex
-              items-center
-              gap-3
-              px-3 py-2.5
-              rounded-lg
-              text-black/60
-              hover:bg-red-50
-              hover:text-red-700
-              font-medium
-              text-sm
-              transition-colors
-              ${collapsed ? "lg:justify-center" : ""}
-            `}
             title={collapsed ? "Déconnexion" : undefined}
+            className={`flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/65 transition hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 ${
+              collapsed ? "lg:justify-center lg:px-0" : ""
+            }`}
           >
-            <LogOut size={18} strokeWidth={1.8} />
-
-            <span className={collapsed ? "lg:hidden" : ""}>
-              Déconnexion
-            </span>
+            <AdminIcon name="logout" size={18} />
+            <span className={collapsed ? "lg:hidden" : ""}>Déconnexion</span>
           </button>
         </div>
       </aside>
 
-      {/* =========================
-          MOBILE SPACING
-      ========================== */}
-      <div className="lg:hidden h-16" />
+      <div className="h-16 shrink-0 lg:hidden" aria-hidden="true" />
     </>
   );
 }

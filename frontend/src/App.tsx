@@ -28,6 +28,7 @@ import AgentLayout from "./components/agent/AgentLayout";
 import GestionnaireLayout from "./components/gestionnaire/GestionnaireLayout";
 import GestionnaireMaintenance from "./pages/gestionnaire/GestionnaireMaintenance";
 
+
 // ============================================================
 // PAGES PUBLIQUES
 // ============================================================
@@ -55,6 +56,8 @@ import ReservationPage from "./pages/client/ReservationPage";
 import MyReservationsPage from "./pages/client/MyReservationsPage";
 import ReservationDetailPage from "./pages/client/ReservationDetailPage";
 import CompleteProfilePage from "./pages/client/CompleteProfilePage";
+import ProfilePage from "./pages/client/ProfilePage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // ============================================================
 // ADMIN
@@ -62,6 +65,10 @@ import CompleteProfilePage from "./pages/client/CompleteProfilePage";
 
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminParametres from "./pages/admin/AdminParametres";
+import NotificationsPage from "./pages/notifications/NotificationsPage";
+
 
 // ============================================================
 // GESTIONNAIRE
@@ -69,6 +76,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 
 import GestionnaireDashboard from "./pages/gestionnaire/GestionnaireDashboard";
 import GestionnaireVehicles from "./pages/gestionnaire/GestionnaireVehicles";
+import GestionnaireReservations from "./pages/gestionnaire/GestionnaireReservations";
+import GestionnaireLocations from "./pages/gestionnaire/GestionnaireLocations";
 
 // ============================================================
 // AGENT
@@ -83,6 +92,10 @@ import AgentReservationDetail from "./pages/agent/AgentReservationDetail";
 import AgentLocations from "./pages/agent/AgentLocations";
 import AgentVehicleReturns from "./pages/agent/AgentVehicleReturns";
 import AgentContracts from "./pages/agent/AgentContracts";
+import AgentFacturation from "./pages/agent/AgentFacturation";
+import AgentClients from "./pages/agent/AgentClients";
+import AgentSettings from "./pages/agent/AgentSettings";
+
 
 // ============================================================
 // TYPES
@@ -236,24 +249,53 @@ function AppContent() {
 
           <Route path="users" element={<AdminUsers />} />
 
+          <Route path="reports" element={<AdminReports />} />
           <Route
             path="vehicles"
             element={<GestionnaireVehicles />}
           />
+          <Route path="settings" element={<AdminParametres />} />
+          <Route
+            path="notifications"
+            element={<NotificationsPage variant="admin" />}
+          />
+          <Route
+            path="facturation"
+            element={<AgentFacturation canGenerate />}
+          />
+
+
 
           <Route
             path="reservations"
-            element={<AgentReservations />}
+            element={
+              <AgentReservations navigationContext="admin" />
+            }
           />
 
           <Route
             path="payments"
-            element={<AgentPayments />}
+            element={
+              <AgentPayments navigationContext="admin" />
+            }
           />
+
+        <Route
+          path="contracts"
+          element={<AgentContracts />}
+        />
+
+        <Route
+          path="maintenance"
+          element={<GestionnaireMaintenance />}
+        />
+
 
           <Route
             path="locations"
-            element={<AgentLocations />}
+            element={
+              <AgentLocations navigationContext="admin" />
+            }
           />
     </Route>
 
@@ -308,6 +350,21 @@ function AppContent() {
         }
       />
 
+      <Route
+        path="/profil"
+        element={
+          <ProtectedRoute roles={["CLIENT"]}>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+
+
+      <Route
+        path="/auth/reset-password"
+        element={<ResetPasswordPage />}
+      />
+
       {/* ------------------------------------------------------
           CRÉER UNE RÉSERVATION
           /reservation
@@ -321,6 +378,8 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+
+
 
       {/* ------------------------------------------------------
           MES RÉSERVATIONS
@@ -336,6 +395,8 @@ function AppContent() {
         }
       />
 
+
+
       {/* ------------------------------------------------------
           DÉTAIL D'UNE RÉSERVATION
           /reservations/:id
@@ -349,6 +410,8 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+
+
 
       {/* ------------------------------------------------------
           PROFIL
@@ -386,23 +449,41 @@ function AppContent() {
 
   <Route
   path="paiements"
-  element={<AgentPayments />}
+  element={
+    <AgentPayments navigationContext="agent" />
+  }
 />
 
   <Route
     path="reservations"
-    element={<AgentReservations />}
+    element={
+      <AgentReservations navigationContext="agent" />
+    }
   />
 
   <Route
     path="reservations/create"
     element={<AgentCreateReservation />}
   />
+  <Route path="clients" element={<AgentClients />} />
+  <Route path="notifications" element={<NotificationsPage />} />
 
   <Route
   path="locations"
-  element={<AgentLocations />}
-/>
+  element={
+    <AgentLocations navigationContext="agent" />
+  }
+  />
+
+  <Route
+  path="settings"
+  element={<AgentSettings />}
+  />
+
+  <Route
+        path="facturation"
+        element={<AgentFacturation canGenerate />}
+      />
 
 <Route
   path="locations/returns"
@@ -440,10 +521,26 @@ function AppContent() {
         />
 
         <Route
+            path="reservations"
+            element={<GestionnaireReservations />}
+          />
+          <Route
+            path="rentals"
+            element={<GestionnaireLocations />}
+          />
+
+        <Route
+        path="settings"
+        element={<AgentSettings />}
+        />
+
+        <Route
           path="vehicles"
           element={<GestionnaireVehicles />}
         />
       </Route>
+
+
 
       {/* ======================================================
           404

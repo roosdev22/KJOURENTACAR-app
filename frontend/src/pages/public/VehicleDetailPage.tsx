@@ -10,7 +10,6 @@ import {
   CarFront,
   Heart,
   CalendarDays,
-  Loader2,
   AlertCircle,
   CheckCircle2,
   Star,
@@ -305,7 +304,6 @@ export default function VehicleDetailPage() {
   const navigate = useNavigate();
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [favorite, setFavorite] = useState(false);
 
@@ -320,7 +318,7 @@ useEffect(() => {
 
   const loadVehicle = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       setError(null);
 
       const data = await vehicleService.getVehicle(id);
@@ -330,7 +328,7 @@ useEffect(() => {
       console.error("[VehicleDetailPage] Erreur chargement:", err);
       if (mounted) setError("Impossible de charger ce véhicule pour le moment.");
     } finally {
-      if (mounted) setLoading(false);
+      // if (mounted) setLoading(false);
     }
   };
 

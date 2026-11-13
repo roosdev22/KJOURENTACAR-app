@@ -1,12 +1,4 @@
-import {
-  CalendarDays,
-  CarFront,
-  Check,
-  Clock3,
-  Send,
-  ShieldCheck,
-} from "lucide-react";
-
+import AdminIcon from "../admin/AdminIcon";
 import type { Vehicle } from "../../api/services/vehicleService";
 
 interface ReservationSummaryProps {
@@ -82,11 +74,7 @@ export default function ReservationSummary({
           <div>
             <div className="mb-3 flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-100 bg-red-50">
-                <Send
-                  size={12}
-                  strokeWidth={2.2}
-                  className="text-red-600"
-                />
+                <AdminIcon name="send" size={14} className="text-[#B4232F]" />
               </span>
 
               <p className="text-[8px] font-black uppercase tracking-[0.22em] text-red-600">
@@ -128,11 +116,7 @@ export default function ReservationSummary({
         <div className="rounded-2xl border border-neutral-200/80 bg-neutral-50/70 p-4">
 
           <div className="mb-3 flex items-center gap-2">
-            <CalendarDays
-              size={13}
-              strokeWidth={1.8}
-              className="text-neutral-400"
-            />
+            <AdminIcon name="calendar-check" size={15} className="text-[#64748B]" />
 
             <p className="text-[8px] font-black uppercase tracking-[0.18em] text-neutral-400">
               Période de location
@@ -176,11 +160,7 @@ export default function ReservationSummary({
           <div className="mb-4 flex items-center justify-between">
 
             <div className="flex items-center gap-2">
-              <CarFront
-                size={13}
-                strokeWidth={1.8}
-                className="text-neutral-400"
-              />
+              <AdminIcon name="car-front" size={15} className="text-[#64748B]" />
 
               <p className="text-[8px] font-black uppercase tracking-[0.18em] text-neutral-400">
                 Véhicules sélectionnés
@@ -196,11 +176,7 @@ export default function ReservationSummary({
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/50 px-4 py-8 text-center">
 
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-200 bg-white">
-                <CarFront
-                  size={16}
-                  strokeWidth={1.4}
-                  className="text-neutral-300"
-                />
+                <AdminIcon name="car-front" size={18} className="text-neutral-300" />
               </div>
 
               <p className="text-[10px] font-bold text-neutral-400">
@@ -231,11 +207,7 @@ export default function ReservationSummary({
                   <div className="flex min-w-0 items-center gap-3">
 
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 transition-colors group-hover:border-red-100 group-hover:bg-red-50">
-                      <CarFront
-                        size={14}
-                        strokeWidth={1.7}
-                        className="text-neutral-400 transition-colors group-hover:text-red-600"
-                      />
+                      <AdminIcon name="car-front" size={16} className="text-neutral-400 transition-colors group-hover:text-[#B4232F]" />
                     </div>
 
                     <div className="min-w-0">
@@ -283,11 +255,7 @@ export default function ReservationSummary({
           <div className="flex items-start gap-3">
 
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white">
-              <ShieldCheck
-                size={14}
-                strokeWidth={1.7}
-                className="text-neutral-500"
-              />
+              <AdminIcon name="shield" size={16} className="text-neutral-500" />
             </div>
 
             <div className="min-w-0">
@@ -342,19 +310,16 @@ export default function ReservationSummary({
           <span className="flex items-center gap-2">
             {isSubmitting ? (
               <>
-                <Clock3
-                  size={12}
-                  strokeWidth={2}
+                <AdminIcon
+                  name="clock"
+                  size={14}
                   className="animate-pulse"
                 />
                 Envoi en cours...
               </>
             ) : (
               <>
-                <Send
-                  size={12}
-                  strokeWidth={2}
-                />
+                <AdminIcon name="send" size={14} />
                 Envoyer la réservation
               </>
             )}
@@ -371,10 +336,7 @@ export default function ReservationSummary({
             ].join(" ")}
           >
             {canSubmit && !isSubmitting ? (
-              <Check
-                size={12}
-                strokeWidth={2.5}
-              />
+              <AdminIcon name="check" size={14} strokeWidth={2.5} />
             ) : (
               <span className="h-1.5 w-1.5 rounded-full bg-current" />
             )}
@@ -386,11 +348,7 @@ export default function ReservationSummary({
         ================================================== */}
 
         <div className="mt-4 flex items-center justify-center gap-2">
-          <ShieldCheck
-            size={10}
-            strokeWidth={1.8}
-            className="text-neutral-300"
-          />
+          <AdminIcon name="shield" size={12} className="text-neutral-400" />
 
           <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-neutral-300">
             Vérification sécurisée par K-JOU RENT A CAR

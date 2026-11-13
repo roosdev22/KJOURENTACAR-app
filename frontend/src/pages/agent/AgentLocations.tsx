@@ -14,6 +14,9 @@ import { useNavigate } from "react-router-dom";
 import reservationService from "../../api/services/reservationService";
 import type { Reservation } from "../../types/reservation";
 
+interface AgentLocationsProps {
+  navigationContext: "admin" | "agent";
+}
 
 
 // ============================================================
@@ -21,12 +24,17 @@ import type { Reservation } from "../../types/reservation";
 // LOCATIONS EN COURS
 // ============================================================
 
-export default function AgentLocations() {
+export default function AgentLocations({
+  navigationContext,
+}: AgentLocationsProps) {
   const navigate = useNavigate();
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasLoadedSuccessfully, setHasLoadedSuccessfully] =
+    useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // ==========================================================
@@ -37,14 +45,26 @@ export default function AgentLocations() {
   // ==========================================================
 
   const loadLocations = useCallback(async () => {
+    if (isLoading || isRefreshing) {
+      return;
+    }
+
+    const initialLoad = !hasLoadedSuccessfully;
+
     try {
-      setIsLoading(true);
+      if (initialLoad) {
+        setIsLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+
       setError(null);
 
       const data =
         await reservationService.getAllReservations();
 
       setReservations(data);
+      setHasLoadedSuccessfully(true);
     } catch (err: unknown) {
       console.error(
         "Erreur chargement locations :",
@@ -56,8 +76,9 @@ export default function AgentLocations() {
       );
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
-  }, []);
+  }, [hasLoadedSuccessfully, isLoading, isRefreshing]);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,6 +93,7 @@ export default function AgentLocations() {
         }
 
         setReservations(data);
+        setHasLoadedSuccessfully(true);
         setError(null);
       } catch (err: unknown) {
         if (cancelled) {
@@ -219,10 +241,10 @@ export default function AgentLocations() {
         <button
           type="button"
           onClick={loadLocations}
-          disabled={isLoading}
+          disabled={isLoading || isRefreshing}
           className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isLoading ? (
+          {isLoading || isRefreshing ? (
             <Loader2
               size={17}
               className="animate-spin"
@@ -231,10 +253,19 @@ export default function AgentLocations() {
             <RefreshCw size={17} />
           )}
 
-          Actualiser
+          {isRefreshing ? "Actualisation..." : "Actualiser"}
         </button>
       </div>
 
+      {navigationContext === "admin" && (
+        <p
+          role="status"
+          className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"
+        >
+          Le détail des réservations et le traitement des retours ne
+          disposent pas de routes dédiées dans l’espace Admin.
+        </p>
+      )}
 
       {/* ================================================== */}
       {/* STATS */}
@@ -250,7 +281,7 @@ export default function AgentLocations() {
               </p>
 
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                {activeLocations.length}
+                {hasLoadedSuccessfully ? activeLocations.length : "—"}
               </p>
             </div>
 
@@ -269,11 +300,13 @@ export default function AgentLocations() {
               </p>
 
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                {activeLocations.reduce(
-                  (total, reservation) =>
-                    total + reservation.lignes.length,
-                  0
-                )}
+                {hasLoadedSuccessfully
+                  ? activeLocations.reduce(
+                      (total, reservation) =>
+                        total + reservation.lignes.length,
+                      0,
+                    )
+                  : "—"}
               </p>
             </div>
 
@@ -291,8 +324,12 @@ export default function AgentLocations() {
                 Retours à traiter
               </p>
 
-              <p className="mt-2 text-3xl font-bold text-gray-900">
-                {activeLocations.length}
+              <p className="mt-2 text-sm font-semibold text-gray-700">
+                Non déterminé
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                L’état des retours n’est pas fourni par cette liste.
               </p>
             </div>
 
@@ -310,19 +347,33 @@ export default function AgentLocations() {
       {/* ================================================== */}
 
       {error && (
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm font-medium text-red-700">
-            {error}
-          </p>
+        <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-red-700">{error}</p>
+            {hasLoadedSuccessfully && (
+              <p className="mt-1 text-sm text-red-700">
+                Les données affichées proviennent du dernier chargement réussi
+                et n’ont pas pu être actualisées.
+              </p>
+            )}
+          </div>
 
           <button
             type="button"
             onClick={loadLocations}
-            className="shrink-0 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700"
+            disabled={isLoading || isRefreshing}
+            className="shrink-0 self-start rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:self-auto"
           >
             Réessayer
           </button>
         </div>
+      )}
+
+      {isRefreshing && (
+        <p role="status" className="text-sm text-gray-600">
+          Actualisation en cours. Les lignes affichées proviennent du dernier
+          chargement réussi.
+        </p>
       )}
 
 
@@ -367,7 +418,7 @@ export default function AgentLocations() {
             Chargement des locations...
           </div>
         </div>
-      ) : filteredLocations.length === 0 ? (
+      ) : !hasLoadedSuccessfully ? null : filteredLocations.length === 0 ? (
 
         /* ================================================== */
         /* EMPTY STATE */
@@ -446,18 +497,23 @@ export default function AgentLocations() {
                     {/* Réservation */}
 
                     <td className="px-5 py-4">
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigate(
-                            `/agent/reservations/${reservation.id}`
-                          )
-                        }
-                        className="font-semibold text-gray-900 transition hover:text-red-600"
-                      >
-                        {reservation.numero}
-                      </button>
+                      {navigationContext === "agent" ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              `/agent/reservations/${reservation.id}`
+                            )
+                          }
+                          className="font-semibold text-gray-900 transition hover:text-red-600"
+                        >
+                          {reservation.numero}
+                        </button>
+                      ) : (
+                        <span className="font-semibold text-gray-900">
+                          {reservation.numero}
+                        </span>
+                      )}
 
                       <p className="mt-1 text-xs text-gray-500">
                         {reservation.date_debut
@@ -579,24 +635,27 @@ export default function AgentLocations() {
                     {/* Action */}
 
                     <td className="px-5 py-4">
-
-                      <div className="flex justify-end">
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleReturn(
-                              reservation.id
-                            )
-                          }
-                          className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                      {navigationContext === "agent" ? (
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleReturn(reservation.id)
+                            }
+                            className="inline-flex items-center gap-2 rounded-xl bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                          >
+                            Gérer le retour
+                            <ChevronRight size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <span
+                          aria-label="Aucune action de retour disponible dans l’espace Admin"
+                          className="block text-right text-sm text-gray-500"
                         >
-                          Gérer le retour
-
-                          <ChevronRight size={16} />
-                        </button>
-
-                      </div>
+                          —
+                        </span>
+                      )}
 
                     </td>
 

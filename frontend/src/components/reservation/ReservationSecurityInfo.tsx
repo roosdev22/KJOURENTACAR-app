@@ -1,25 +1,20 @@
-import {
-  Database,
-  LockKeyhole,
-  Server,
-  ShieldCheck,
-} from "lucide-react";
+import AdminIcon from "../admin/AdminIcon";
 
 const securityItems = [
   {
-    icon: LockKeyhole,
+    icon: "lock" as const,
     title: "Données protégées",
     description:
       "Vos informations sont transmises de manière sécurisée à notre serveur.",
   },
   {
-    icon: Server,
+    icon: "server" as const,
     title: "Serveur comme référence",
     description:
       "Les règles de réservation et les calculs définitifs sont vérifiés côté serveur.",
   },
   {
-    icon: Database,
+    icon: "database" as const,
     title: "Disponibilité vérifiée",
     description:
       "La disponibilité réelle des véhicules est contrôlée lors de la création de la réservation.",
@@ -31,10 +26,7 @@ export default function ReservationSecurityInfo() {
     <section className="rounded-2xl border border-[#E5E5E5] bg-white p-6">
       <div className="mb-6 flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F7F7F7]">
-          <ShieldCheck
-            size={21}
-            className="text-[#CC0000]"
-          />
+          <AdminIcon name="shield" size={21} className="text-[#B4232F]" />
         </div>
 
         <div>
@@ -51,17 +43,12 @@ export default function ReservationSecurityInfo() {
 
       <div className="grid gap-5 sm:grid-cols-3">
         {securityItems.map((item) => {
-          const Icon = item.icon;
-
           return (
             <div
               key={item.title}
               className="rounded-xl bg-[#F8F8F8] p-4"
             >
-              <Icon
-                size={20}
-                className="text-[#CC0000]"
-              />
+              <AdminIcon name={item.icon} size={20} className="text-[#B4232F]" />
 
               <h3 className="mt-3 text-sm font-black text-[#111111]">
                 {item.title}

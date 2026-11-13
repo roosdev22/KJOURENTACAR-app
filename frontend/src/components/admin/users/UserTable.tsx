@@ -1,21 +1,3 @@
-import {
-  UserCheck,
-  UserX,
-  Pencil,
-  Trash2,
-  Users,
-  ChevronUp,
-  ChevronDown,
-  ShieldCheck,
-  Crown,
-  BriefcaseBusiness,
-  UserRound,
-  CheckCircle2,
-  XCircle,
-  Mail,
-  Search,
-} from "lucide-react";
-
 import { useState, useMemo } from "react";
 
 import type {
@@ -27,6 +9,7 @@ import {
   USER_ROLES,
   ROLE_LABELS,
 } from "./userConstants";
+import AdminIcon, { type AdminIconName } from "../AdminIcon";
 
 
 /**
@@ -56,8 +39,7 @@ import {
  * COULEURS PAR RÔLE
  * ============================================================
  *
- * Couleurs plus imposantes / saturées pour bien
- * différencier chaque rôle visuellement.
+ * Les rôles restent distincts sans introduire une palette concurrente.
  */
 
 const ROLE_COLORS: Record<
@@ -65,16 +47,16 @@ const ROLE_COLORS: Record<
   { bg: string; text: string; border: string; icon: string }
 > = {
   SUPER_ADMIN: {
-    bg: "bg-violet-100",
-    text: "text-violet-800",
-    border: "border-violet-300",
-    icon: "text-violet-600",
+    bg: "bg-kjou-carbon/10",
+    text: "text-kjou-carbon",
+    border: "border-kjou-carbon/20",
+    icon: "text-kjou-carbon",
   },
   ADMIN: {
-    bg: "bg-blue-100",
-    text: "text-blue-800",
-    border: "border-blue-300",
-    icon: "text-blue-600",
+    bg: "bg-kjou-red/10",
+    text: "text-kjou-red-hover",
+    border: "border-kjou-red/20",
+    icon: "text-kjou-red",
   },
   GESTIONNAIRE: {
     bg: "bg-amber-100",
@@ -83,16 +65,16 @@ const ROLE_COLORS: Record<
     icon: "text-amber-600",
   },
   AGENT: {
-    bg: "bg-emerald-100",
-    text: "text-emerald-800",
-    border: "border-emerald-300",
-    icon: "text-emerald-600",
+    bg: "bg-status-success/10",
+    text: "text-status-success",
+    border: "border-status-success/20",
+    icon: "text-status-success",
   },
   CLIENT: {
-    bg: "bg-slate-200",
-    text: "text-slate-700",
-    border: "border-slate-300",
-    icon: "text-slate-600",
+    bg: "bg-kjou-mist",
+    text: "text-kjou-text",
+    border: "border-kjou-border",
+    icon: "text-kjou-muted",
   },
 };
 
@@ -110,14 +92,12 @@ const DEFAULT_ROLE_COLOR = {
  * ============================================================
  */
 
-const ROLE_ICONS: Partial<
-  Record<UserRole, typeof Crown>
-> = {
-  SUPER_ADMIN: Crown,
-  ADMIN: ShieldCheck,
-  GESTIONNAIRE: BriefcaseBusiness,
-  AGENT: UserCheck,
-  CLIENT: UserRound,
+const ROLE_ICONS: Partial<Record<UserRole, AdminIconName>> = {
+  SUPER_ADMIN: "crown",
+  ADMIN: "shield",
+  GESTIONNAIRE: "briefcase",
+  AGENT: "user-check",
+  CLIENT: "user-round",
 };
 
 
@@ -184,7 +164,8 @@ const SortIcon = ({
       `}
     >
 
-      <ChevronUp
+      <AdminIcon
+        name="chevron-up"
         size={10}
         strokeWidth={2.5}
         className={
@@ -195,7 +176,8 @@ const SortIcon = ({
         }
       />
 
-      <ChevronDown
+      <AdminIcon
+        name="chevron-down"
         size={10}
         strokeWidth={2.5}
         className={
@@ -469,11 +451,10 @@ export default function UserTable({
         className="
           w-full
           overflow-hidden
-          rounded-xl
+          rounded-kjou-card
           border
-          border-slate-200
+          border-kjou-border
           bg-white
-          shadow-sm
         "
       >
 
@@ -486,7 +467,7 @@ export default function UserTable({
             flex
             items-center
             border-b
-            border-slate-200
+            border-kjou-border
             bg-slate-50/70
           "
         >
@@ -585,11 +566,10 @@ export default function UserTable({
       className="
         w-full
         overflow-hidden
-        rounded-xl
+        rounded-kjou-card
         border
-        border-slate-200
+        border-kjou-border
         bg-white
-        shadow-sm
       "
     >
 
@@ -604,7 +584,7 @@ export default function UserTable({
           items-center
           gap-2
           border-b
-          border-slate-200
+          border-kjou-border
           bg-white
           px-5
           py-3
@@ -615,7 +595,8 @@ export default function UserTable({
         "
       >
 
-        <Search
+        <AdminIcon
+          name="search"
           size={16}
           strokeWidth={2}
           className="
@@ -700,7 +681,8 @@ export default function UserTable({
             "
           >
 
-            <Users
+            <AdminIcon
+              name="users"
               size={22}
               className="text-slate-400"
             />
@@ -968,9 +950,9 @@ export default function UserTable({
                   const initials =
                     getInitials(user);
 
-                  const RoleIcon =
+                  const roleIcon =
                     ROLE_ICONS[user.role] ??
-                    UserRound;
+                    "user-round";
 
                   const roleLabel =
                     ROLE_LABELS[user.role] ??
@@ -1076,7 +1058,8 @@ export default function UserTable({
 
                             {user.is_active ? (
 
-                              <CheckCircle2
+                              <AdminIcon
+                                name="check-circle"
                                 size={11}
                                 className="text-emerald-500"
                                 strokeWidth={2.5}
@@ -1084,7 +1067,8 @@ export default function UserTable({
 
                             ) : (
 
-                              <XCircle
+                              <AdminIcon
+                                name="x-circle"
                                 size={11}
                                 className="text-slate-400"
                                 strokeWidth={2.5}
@@ -1154,7 +1138,8 @@ export default function UserTable({
                         "
                       >
 
-                        <Mail
+                        <AdminIcon
+                          name="mail"
                           size={13}
                           strokeWidth={1.8}
                           className="
@@ -1214,7 +1199,8 @@ export default function UserTable({
                           title={roleLabel}
                         >
 
-                          <RoleIcon
+                          <AdminIcon
+                            name={roleIcon}
                             size={13}
                             strokeWidth={2.2}
                             className={`
@@ -1318,7 +1304,8 @@ export default function UserTable({
                             "
                           >
 
-                            <CheckCircle2
+                            <AdminIcon
+                              name="check-circle"
                               size={14}
                               className="text-emerald-500"
                               strokeWidth={2.4}
@@ -1345,7 +1332,8 @@ export default function UserTable({
                             "
                           >
 
-                            <XCircle
+                            <AdminIcon
+                              name="x-circle"
                               size={14}
                               className="text-slate-400"
                               strokeWidth={2.4}
@@ -1402,7 +1390,8 @@ export default function UserTable({
                           "
                         >
 
-                          <Pencil
+                          <AdminIcon
+                            name="edit"
                             size={14}
                             strokeWidth={2}
                           />
@@ -1447,14 +1436,16 @@ export default function UserTable({
 
                           {user.is_active ? (
 
-                            <UserX
+                            <AdminIcon
+                              name="user-x"
                               size={14}
                               strokeWidth={2}
                             />
 
                           ) : (
 
-                            <UserCheck
+                            <AdminIcon
+                              name="user-check"
                               size={14}
                               strokeWidth={2}
                             />
@@ -1493,7 +1484,8 @@ export default function UserTable({
                           "
                         >
 
-                          <Trash2
+                          <AdminIcon
+                            name="trash"
                             size={14}
                             strokeWidth={2}
                           />
@@ -1538,7 +1530,8 @@ export default function UserTable({
               "
             >
 
-              <Users
+              <AdminIcon
+                name="users"
                 size={13}
                 className="text-slate-400"
               />

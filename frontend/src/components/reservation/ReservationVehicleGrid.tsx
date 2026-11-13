@@ -1,16 +1,6 @@
-import {
-  CarFront,
-  Check,
-  ChevronRight,
-  DoorOpen,
-  Fuel,
-  Gauge,
-  Snowflake,
-  Users,
-} from "lucide-react";
-
 import type { ReactNode } from "react";
 
+import AdminIcon from "../admin/AdminIcon";
 import type {
   Vehicle,
   VehicleCategory,
@@ -25,6 +15,9 @@ interface ReservationVehicleGridProps {
   selectedCategory: VehicleCategory | "ALL";
   selectedVehicleIds: string[];
   onVehicleSelect: (vehicle: Vehicle) => void;
+  searchQuery: string;
+  onSearchQueryChange: (value: string) => void;
+  onResetFilters: () => void;
   loading?: boolean;
   disabled?: boolean;
 }
@@ -77,12 +70,8 @@ function getFuelLabel(value: string): string {
 }
 
 function getVehicleImage(vehicle: Vehicle): string | null {
-  const image =
-    (vehicle as Vehicle & { image?: string | null }).image ??
-    (vehicle as Vehicle & { image_url?: string | null }).image_url ??
-    null;
-
-  return image;
+  const primaryImage = vehicle.images.find((image) => image.is_primary);
+  return primaryImage?.image_url ?? vehicle.images[0]?.image_url ?? null;
 }
 
 function formatAmount(
@@ -188,19 +177,29 @@ export default function ReservationVehicleGrid({
   selectedCategory,
   selectedVehicleIds,
   onVehicleSelect,
+  searchQuery,
+  onSearchQueryChange,
+  onResetFilters,
   loading = false,
   disabled = false,
 }: ReservationVehicleGridProps) {
   const availableVehicles = vehicles.filter(
     (vehicle) => vehicle.status === "AVAILABLE",
   );
+  const normalizedSearch = searchQuery.trim().toLocaleLowerCase("fr");
 
-  const filteredVehicles =
-    selectedCategory === "ALL"
-      ? availableVehicles
-      : availableVehicles.filter(
-          (vehicle) => vehicle.category === selectedCategory,
-        );
+  const filteredVehicles = availableVehicles.filter((vehicle) => {
+    const matchesCategory =
+      selectedCategory === "ALL" ||
+      vehicle.category === selectedCategory;
+    const matchesSearch =
+      !normalizedSearch ||
+      `${vehicle.brand} ${vehicle.model} ${vehicle.category_display ?? vehicle.category}`
+        .toLocaleLowerCase("fr")
+        .includes(normalizedSearch);
+
+    return matchesCategory && matchesSearch;
+  });
 
   // ==========================================================
   // LOADING
@@ -234,25 +233,33 @@ export default function ReservationVehicleGrid({
     return (
       <section className="bg-neutral-50">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-12 text-center shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+          <div className="rounded-2xl border border-[#E3E6E8] bg-white px-6 py-12 text-center shadow-sm">
             <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50">
-              <CarFront
-                size={19}
-                strokeWidth={1.5}
-                className="text-neutral-400"
-              />
+              <AdminIcon name="car-front" size={19} className="text-neutral-400" />
             </div>
 
-            <span className="mx-auto mt-4 block h-[2px] w-10 bg-red-600" />
+            <span className="mx-auto mt-4 block h-[2px] w-10 bg-[#B4232F]" />
 
-            <h3 className="mt-4 text-xl font-black tracking-tight text-neutral-950">
-              Aucun véhicule disponible
+            <h3 className="mt-4 text-xl font-bold tracking-tight text-[#202327]">
+              {vehicles.length === 0
+                ? "Aucun véhicule disponible"
+                : "Aucun résultat pour ces critères"}
             </h3>
 
-            <p className="mx-auto mt-2 max-w-md text-[12px] leading-5 text-neutral-500">
-              Aucun véhicule ne correspond actuellement à cette catégorie.
-              Essayez une autre catégorie.
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#64748B]">
+              {vehicles.length === 0
+                ? "Aucun véhicule n'est actuellement proposé à la réservation."
+                : "Aucun véhicule disponible ne correspond à la recherche et à la catégorie sélectionnées."}
             </p>
+            {vehicles.length > 0 && (
+              <button
+                type="button"
+                onClick={onResetFilters}
+                className="mt-5 rounded-lg border border-[#E3E6E8] px-4 py-2 text-sm font-semibold text-[#202327] transition hover:border-[#B4232F] hover:text-[#B4232F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B4232F] focus-visible:ring-offset-2"
+              >
+                Effacer les filtres
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -276,36 +283,37 @@ export default function ReservationVehicleGrid({
             <div className="flex items-center gap-2">
               <span className="h-[2px] w-7 bg-red-600" />
 
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-red-600">
-                02 · Véhicules
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4232F]">
+                Parc automobile
               </p>
             </div>
 
-            <h2 className="mt-2 text-[24px] font-black tracking-[-0.04em] text-neutral-950 sm:text-[26px]">
-              Votre sélection
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#202327] sm:text-[26px]">
+              Choisissez votre véhicule
             </h2>
 
-            <p className="mt-1 text-[12px] text-neutral-500">
-              Sélectionnez un ou plusieurs véhicules pour votre location.
+            <p className="mt-1 text-sm text-[#64748B]">
+              Consultez les équipements et tarifs, puis choisissez le véhicule à réserver.
             </p>
           </div>
 
-          <div className="hidden items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 shadow-[0_3px_12px_rgba(0,0,0,0.025)] sm:flex">
-            <CarFront
-              size={15}
-              strokeWidth={1.7}
-              className="text-red-600"
+          <div className="flex w-full items-center gap-2 rounded-xl border border-[#E3E6E8] bg-white px-3.5 py-2.5 sm:w-auto">
+            <AdminIcon name="search" size={17} className="shrink-0 text-[#64748B]" />
+            <label className="sr-only" htmlFor="vehicle-search">
+              Rechercher un véhicule
+            </label>
+            <input
+              id="vehicle-search"
+              type="search"
+              value={searchQuery}
+              onChange={(event) => onSearchQueryChange(event.target.value)}
+              placeholder="Marque, modèle ou catégorie"
+              disabled={disabled}
+              className="min-w-0 flex-1 bg-transparent text-sm text-[#202327] outline-none placeholder:text-[#64748B] focus-visible:ring-0 disabled:cursor-not-allowed sm:w-56"
             />
-
-            <div>
-              <p className="text-[16px] font-black leading-none text-neutral-950">
-                {filteredVehicles.length}
-              </p>
-
-              <p className="mt-1 text-[8px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                disponibles
-              </p>
-            </div>
+            <span className="hidden border-l border-[#E3E6E8] pl-3 text-xs font-semibold text-[#64748B] sm:block">
+              {filteredVehicles.length} disponible{filteredVehicles.length !== 1 ? "s" : ""}
+            </span>
           </div>
         </div>
 
@@ -357,11 +365,7 @@ export default function ReservationVehicleGrid({
                   ) : (
                     <div className="flex h-full items-center justify-center">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/80">
-                        <CarFront
-                          size={25}
-                          strokeWidth={1.4}
-                          className="text-neutral-300"
-                        />
+                        <AdminIcon name="car-front" size={25} className="text-neutral-300" />
                       </div>
                     </div>
                   )}
@@ -376,7 +380,7 @@ export default function ReservationVehicleGrid({
                   {/* CATEGORY */}
 
                   <div className="absolute left-3 top-3 rounded-lg border border-white/70 bg-white/92 px-2.5 py-1.5 shadow-sm backdrop-blur-md">
-                    <span className="text-[8px] font-black uppercase tracking-[0.12em] text-red-600">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#B4232F]">
                       {getCategoryLabel(vehicle.category)}
                     </span>
                   </div>
@@ -385,10 +389,7 @@ export default function ReservationVehicleGrid({
 
                   {selected && (
                     <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1.5 text-white shadow-lg">
-                      <Check
-                        size={10}
-                        strokeWidth={3}
-                      />
+                      <AdminIcon name="check" size={12} strokeWidth={3} />
 
                       <span className="text-[8px] font-black uppercase tracking-[0.08em]">
                         Sélectionné
@@ -422,11 +423,11 @@ export default function ReservationVehicleGrid({
 
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-neutral-400">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                         {vehicle.year}
                       </p>
 
-                      <h3 className="mt-1 truncate text-[18px] font-black tracking-[-0.03em] text-neutral-950">
+                      <h3 className="mt-1 truncate text-lg font-bold tracking-tight text-[#202327]">
                         {vehicle.brand} {vehicle.model}
                       </h3>
                     </div>
@@ -448,10 +449,7 @@ export default function ReservationVehicleGrid({
 
                     <Feature
                       icon={
-                        <Gauge
-                          size={14}
-                          strokeWidth={1.7}
-                        />
+                        <AdminIcon name="gauge" size={15} />
                       }
                       label="Transmission"
                       value={getTransmissionLabel(
@@ -461,10 +459,7 @@ export default function ReservationVehicleGrid({
 
                     <Feature
                       icon={
-                        <Fuel
-                          size={14}
-                          strokeWidth={1.7}
-                        />
+                        <AdminIcon name="fuel" size={15} />
                       }
                       label="Carburant"
                       value={getFuelLabel(vehicle.fuel_type)}
@@ -472,10 +467,7 @@ export default function ReservationVehicleGrid({
 
                     <Feature
                       icon={
-                        <Users
-                          size={14}
-                          strokeWidth={1.7}
-                        />
+                        <AdminIcon name="users" size={15} />
                       }
                       label="Places"
                       value={`${vehicle.seats ?? "—"} places`}
@@ -483,10 +475,7 @@ export default function ReservationVehicleGrid({
 
                     <Feature
                       icon={
-                        <DoorOpen
-                          size={14}
-                          strokeWidth={1.7}
-                        />
+                        <AdminIcon name="door-open" size={15} />
                       }
                       label="Portes"
                       value={`${vehicle.doors ?? "—"} portes`}
@@ -494,10 +483,7 @@ export default function ReservationVehicleGrid({
 
                     <Feature
                       icon={
-                        <Snowflake
-                          size={14}
-                          strokeWidth={1.7}
-                        />
+                        <AdminIcon name="snowflake" size={15} />
                       }
                       label="Climatisation"
                       value={
@@ -509,10 +495,7 @@ export default function ReservationVehicleGrid({
 
                     <Feature
                       icon={
-                        <Gauge
-                          size={14}
-                          strokeWidth={1.7}
-                        />
+                        <AdminIcon name="gauge" size={15} />
                       }
                       label="Kilométrage"
                       value={formatMileage(vehicle.mileage)}
@@ -525,28 +508,30 @@ export default function ReservationVehicleGrid({
 
                   <div className="mt-4 flex items-end justify-between border-t border-neutral-100 pt-4">
                     <div>
-                      <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                         Tarif journalier
                       </p>
 
                       <div className="mt-1 flex items-baseline gap-1">
-                        <span className="text-[18px] font-black tracking-tight text-neutral-950">
+                        <span className="text-lg font-bold tracking-tight text-[#202327]">
                           {formatAmount(vehicle.daily_rate)}
                         </span>
 
-                        <span className="text-[10px] font-medium text-neutral-400">
-                          / jour
+                        <span className="text-xs font-medium text-[#64748B]">
+                          HTG / jour
                         </span>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#64748B]">
                         Caution
                       </p>
 
-                      <p className="mt-1 text-[11px] font-bold text-neutral-800">
-                        {formatAmount(vehicle.deposit)}
+                      <p className="mt-1 text-sm font-semibold text-[#202327]">
+                        {vehicle.deposit === null
+                          ? "—"
+                          : `${formatAmount(vehicle.deposit)} HTG`}
                       </p>
                     </div>
                   </div>
@@ -590,26 +575,17 @@ export default function ReservationVehicleGrid({
                     >
                       {selected ? (
                         <>
-                          <Check
-                            size={12}
-                            strokeWidth={3}
-                          />
+                          <AdminIcon name="check" size={13} strokeWidth={3} />
 
                           <span>Retirer</span>
                         </>
                       ) : (
                         <>
-                          <CarFront
-                            size={12}
-                            strokeWidth={2}
-                          />
+                          <AdminIcon name="car-front" size={13} strokeWidth={2} />
 
                           <span>Choisir</span>
 
-                          <ChevronRight
-                            size={11}
-                            strokeWidth={2.5}
-                          />
+                          <AdminIcon name="chevron-right" size={13} strokeWidth={2.5} />
                         </>
                       )}
                     </button>

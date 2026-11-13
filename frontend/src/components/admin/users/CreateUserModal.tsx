@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { X } from "lucide-react";
+import AdminIcon from "../AdminIcon";
 
 import type {
   CreateUserPayload,
@@ -130,7 +130,7 @@ export default function CreateUserModal({
             aria-label="Fermer"
             title="Fermer"
           >
-            <X size={18} />
+            <AdminIcon name="x" size={18} />
           </button>
         </div>
 

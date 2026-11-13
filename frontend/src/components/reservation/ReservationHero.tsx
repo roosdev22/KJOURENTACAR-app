@@ -1,10 +1,5 @@
 
-import {
-  ArrowRight,
-  CalendarDays,
-  ShieldCheck,
-} from "lucide-react";
-
+import AdminIcon from "../admin/AdminIcon";
 import carImage from "../../assets/images/rrr.jpeg";
 
 // ============================================================
@@ -141,20 +136,13 @@ export default function ReservationHero({
                       disabled ? "" : "group-hover:translate-x-0.5",
                     ].join(" ")}
                   >
-                    <ArrowRight
-                      size={13}
-                      strokeWidth={2.5}
-                    />
+                    <AdminIcon name="arrow-right" size={15} strokeWidth={2.5} />
                   </span>
                 </button>
 
                 {/* Sécurité */}
                 <div className="flex items-center gap-2">
-                  <ShieldCheck
-                    size={16}
-                    strokeWidth={1.8}
-                    className="text-neutral-400"
-                  />
+                  <AdminIcon name="shield" size={17} className="text-neutral-500" />
 
                   <div>
                     <p className="text-[9px] font-semibold uppercase tracking-wider text-neutral-700">
@@ -175,11 +163,7 @@ export default function ReservationHero({
               <div className="mt-7 flex items-center gap-5 border-t border-neutral-200 pt-4">
 
                 <div className="flex items-center gap-1.5">
-                  <CalendarDays
-                    size={13}
-                    strokeWidth={1.8}
-                    className="text-red-600"
-                  />
+                  <AdminIcon name="calendar-check" size={15} className="text-[#B4232F]" />
 
                   <span className="text-[9px] font-semibold uppercase tracking-wider text-neutral-500">
                     Dates flexibles

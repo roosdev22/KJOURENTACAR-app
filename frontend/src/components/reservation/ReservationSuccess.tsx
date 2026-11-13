@@ -1,17 +1,4 @@
-import {
-  CalendarDays,
-  CarFront,
-  CheckCircle2,
-  ClipboardCheck,
-  Clock3,
-  CreditCard,
-  FileText,
-  Info,
-  PlusCircle,
-  ShieldCheck,
-  XCircle,
-} from "lucide-react";
-
+import AdminIcon, { type AdminIconName } from "../admin/AdminIcon";
 import type {
   Reservation,
   ReservationStatus,
@@ -83,7 +70,7 @@ function formatMoney(value: string | null): string {
 ============================================================ */
 
 interface StatusConfig {
-  icon: typeof Clock3;
+  icon: AdminIconName;
   label: string;
   heroLabel: string;
   title: string;
@@ -100,7 +87,7 @@ function getStatusConfig(
   switch (status) {
     case "PENDING_VERIFICATION":
       return {
-        icon: Clock3,
+        icon: "clock",
         label: "En attente de vérification",
         heroLabel: "Demande envoyée",
         title: "Votre demande a bien été enregistrée",
@@ -116,7 +103,7 @@ function getStatusConfig(
 
     case "CONFIRMED":
       return {
-        icon: CheckCircle2,
+        icon: "check-circle",
         label: "Réservation confirmée",
         heroLabel: "Réservation confirmée",
         title: "Votre réservation est confirmée",
@@ -132,7 +119,7 @@ function getStatusConfig(
 
     case "CANCELLED":
       return {
-        icon: XCircle,
+        icon: "x-circle",
         label: "Réservation annulée",
         heroLabel: "Réservation annulée",
         title: "Votre réservation a été annulée",
@@ -148,7 +135,7 @@ function getStatusConfig(
 
     case "EN_COURS":
       return {
-        icon: CarFront,
+        icon: "car-front",
         label: "Location en cours",
         heroLabel: "Location en cours",
         title: "Votre location est en cours",
@@ -164,7 +151,7 @@ function getStatusConfig(
 
     case "TERMINEE":
       return {
-        icon: CheckCircle2,
+        icon: "check-circle",
         label: "Location terminée",
         heroLabel: "Location terminée",
         title: "Votre location est terminée",
@@ -180,7 +167,7 @@ function getStatusConfig(
 
     default:
       return {
-        icon: Info,
+        icon: "info",
         label: "Statut inconnu",
         heroLabel: "Réservation",
         title: "Réservation enregistrée",
@@ -201,18 +188,19 @@ function getStatusConfig(
 ============================================================ */
 
 function SectionHeader({
-  icon: Icon,
+  icon,
   eyebrow,
   title,
 }: {
-  icon: typeof CalendarDays;
+  icon: AdminIconName;
   eyebrow: string;
   title: string;
 }) {
   return (
     <div className="flex items-center gap-3">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FFF1F1]">
-        <Icon
+        <AdminIcon
+          name={icon}
           size={19}
           strokeWidth={2}
           className="text-[#CC0000]"
@@ -279,8 +267,6 @@ export default function ReservationSuccess({
     reservation.statut
   );
 
-  const StatusIcon = statusConfig.icon;
-
   const isPending =
     reservation.statut === "PENDING_VERIFICATION";
 
@@ -319,7 +305,8 @@ export default function ReservationSuccess({
               ].join(" ")}
               aria-hidden="true"
             >
-              <StatusIcon
+              <AdminIcon
+                name={statusConfig.icon}
                 size={32}
                 strokeWidth={1.9}
                 className={statusConfig.iconClassName}
@@ -356,12 +343,7 @@ export default function ReservationSuccess({
             {/* Reservation number */}
 
             <div className="mt-6 inline-flex max-w-full items-center gap-2 rounded-xl bg-[#111111] px-4 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
-              <ClipboardCheck
-                size={15}
-                strokeWidth={2}
-                className="shrink-0 text-white"
-                aria-hidden="true"
-              />
+              <AdminIcon name="clipboard-check" size={16} className="shrink-0 text-white" />
 
               <span className="truncate text-[10px] font-black uppercase tracking-[0.12em] text-white sm:text-xs">
                 {reservation.numero}
@@ -398,11 +380,7 @@ export default function ReservationSuccess({
                       statusConfig.badgeClassName,
                     ].join(" ")}
                   >
-                    <StatusIcon
-                      size={21}
-                      strokeWidth={2}
-                      aria-hidden="true"
-                    />
+                    <AdminIcon name={statusConfig.icon} size={21} strokeWidth={2} />
                   </div>
 
                   <div className="min-w-0">
@@ -429,12 +407,7 @@ export default function ReservationSuccess({
                 {isPending && (
                   <div className="mt-5 rounded-xl border border-[#F0D8B4] bg-[#FFF9F0] p-4">
                     <div className="flex items-start gap-3">
-                      <Clock3
-                        size={17}
-                        strokeWidth={2}
-                        className="mt-0.5 shrink-0 text-[#9A5A00]"
-                        aria-hidden="true"
-                      />
+                      <AdminIcon name="clock" size={17} className="mt-0.5 shrink-0 text-[#9A5A00]" />
 
                       <div className="min-w-0">
                         <p className="text-xs font-black text-[#76531E]">
@@ -462,12 +435,7 @@ export default function ReservationSuccess({
                 {isConfirmed && (
                   <div className="mt-5 rounded-xl border border-[#CBE8D4] bg-[#F3FBF5] p-4">
                     <div className="flex items-start gap-3">
-                      <CheckCircle2
-                        size={17}
-                        strokeWidth={2}
-                        className="mt-0.5 shrink-0 text-[#188A3B]"
-                        aria-hidden="true"
-                      />
+                      <AdminIcon name="check-circle" size={17} className="mt-0.5 shrink-0 text-[#188A3B]" />
 
                       <div>
                         <p className="text-xs font-black text-[#28663A]">
@@ -490,12 +458,7 @@ export default function ReservationSuccess({
                 {isCancelled && (
                   <div className="mt-5 rounded-xl border border-[#F1C7C7] bg-[#FFF5F5] p-4">
                     <div className="flex items-start gap-3">
-                      <XCircle
-                        size={17}
-                        strokeWidth={2}
-                        className="mt-0.5 shrink-0 text-[#B42318]"
-                        aria-hidden="true"
-                      />
+                      <AdminIcon name="x-circle" size={17} className="mt-0.5 shrink-0 text-[#B42318]" />
 
                       <div>
                         <p className="text-xs font-black text-[#8A2C25]">
@@ -556,7 +519,7 @@ export default function ReservationSuccess({
               aria-labelledby="reservation-period-title"
             >
               <SectionHeader
-                icon={CalendarDays}
+                icon="calendar-check"
                 eyebrow="Planning"
                 title="Période de location"
               />
@@ -598,7 +561,7 @@ export default function ReservationSuccess({
             >
               <div className="flex items-center justify-between gap-4">
                 <SectionHeader
-                  icon={CarFront}
+                  icon="car-front"
                   eyebrow="Sélection"
                   title="Véhicules réservés"
                 />
@@ -610,11 +573,7 @@ export default function ReservationSuccess({
 
               {vehicleCount === 0 ? (
                 <div className="mt-5 rounded-xl border border-dashed border-[#DDDDDD] bg-[#FAFAFA] p-6 text-center">
-                  <CarFront
-                    size={24}
-                    className="mx-auto text-[#BBBBBB]"
-                    aria-hidden="true"
-                  />
+                  <AdminIcon name="car-front" size={24} className="mx-auto text-[#BBBBBB]" />
 
                   <p className="mt-2 text-xs text-[#777777]">
                     Aucun véhicule associé à cette
@@ -634,11 +593,7 @@ export default function ReservationSuccess({
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
                                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#111111]">
-                                  <CarFront
-                                    size={15}
-                                    className="text-white"
-                                    aria-hidden="true"
-                                  />
+                                  <AdminIcon name="car-front" size={15} className="text-white" />
                                 </div>
 
                                 <h3 className="truncate text-sm font-black text-[#111111]">
@@ -690,11 +645,7 @@ export default function ReservationSuccess({
                           {ligne.notes?.trim() && (
                             <div className="mt-4 border-t border-[#E8E8E8] pt-4">
                               <div className="flex items-start gap-2.5">
-                                <FileText
-                                  size={14}
-                                  className="mt-0.5 shrink-0 text-[#999999]"
-                                  aria-hidden="true"
-                                />
+                                <AdminIcon name="file" size={14} className="mt-0.5 shrink-0 text-[#999999]" />
 
                                 <div>
                                   <p className="text-[8px] font-black uppercase tracking-[0.12em] text-[#999999]">
@@ -726,7 +677,7 @@ export default function ReservationSuccess({
                 aria-labelledby="reservation-notes-title"
               >
                 <SectionHeader
-                  icon={FileText}
+                  icon="file"
                   eyebrow="Message"
                   title="Vos notes"
                 />
@@ -748,18 +699,14 @@ export default function ReservationSuccess({
               aria-labelledby="reservation-information-title"
             >
               <SectionHeader
-                icon={ShieldCheck}
+                icon="shield"
                 eyebrow="Sécurité"
                 title="Informations importantes"
               />
 
               <div className="mt-5 grid gap-3">
                 <div className="flex items-start gap-3 rounded-xl border border-[#E9E9E9] bg-[#FAFAFA] p-3.5">
-                  <CheckCircle2
-                    size={16}
-                    className="mt-0.5 shrink-0 text-[#188A3B]"
-                    aria-hidden="true"
-                  />
+                  <AdminIcon name="check-circle" size={16} className="mt-0.5 shrink-0 text-[#188A3B]" />
 
                   <p className="text-xs leading-5 text-[#666666]">
                     Les montants affichés sont calculés
@@ -769,11 +716,7 @@ export default function ReservationSuccess({
                 </div>
 
                 <div className="flex items-start gap-3 rounded-xl border border-[#E9E9E9] bg-[#FAFAFA] p-3.5">
-                  <CheckCircle2
-                    size={16}
-                    className="mt-0.5 shrink-0 text-[#188A3B]"
-                    aria-hidden="true"
-                  />
+                  <AdminIcon name="check-circle" size={16} className="mt-0.5 shrink-0 text-[#188A3B]" />
 
                   <p className="text-xs leading-5 text-[#666666]">
                     La disponibilité des véhicules et les
@@ -783,11 +726,7 @@ export default function ReservationSuccess({
                 </div>
 
                 <div className="flex items-start gap-3 rounded-xl border border-[#E9E9E9] bg-[#FAFAFA] p-3.5">
-                  <CheckCircle2
-                    size={16}
-                    className="mt-0.5 shrink-0 text-[#188A3B]"
-                    aria-hidden="true"
-                  />
+                  <AdminIcon name="check-circle" size={16} className="mt-0.5 shrink-0 text-[#188A3B]" />
 
                   <p className="text-xs leading-5 text-[#666666]">
                     Conservez votre numéro de réservation
@@ -831,11 +770,7 @@ export default function ReservationSuccess({
                     </div>
 
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
-                      <ClipboardCheck
-                        size={17}
-                        className="text-white"
-                        aria-hidden="true"
-                      />
+                      <AdminIcon name="clipboard-check" size={17} className="text-white" />
                     </div>
                   </div>
                 </div>
@@ -867,10 +802,10 @@ export default function ReservationSuccess({
                       statusConfig.badgeClassName,
                     ].join(" ")}
                   >
-                    <StatusIcon
+                    <AdminIcon
+                      name={statusConfig.icon}
                       size={13}
                       strokeWidth={2}
-                      aria-hidden="true"
                     />
 
                     {reservation.statut_display ||
@@ -955,11 +890,7 @@ export default function ReservationSuccess({
 
                   <div className="mt-3 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-1.5">
-                      <ShieldCheck
-                        size={13}
-                        className="text-[#999999]"
-                        aria-hidden="true"
-                      />
+                      <AdminIcon name="shield" size={14} className="text-[#999999]" />
 
                       <span className="text-xs text-[#666666]">
                         Caution
@@ -993,11 +924,7 @@ export default function ReservationSuccess({
                 <div className="mt-5 border-t border-[#EEEEEE] pt-5">
                   <div className="flex items-start gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FFF1F1]">
-                      <CreditCard
-                        size={15}
-                        className="text-[#CC0000]"
-                        aria-hidden="true"
-                      />
+                      <AdminIcon name="credit-card" size={16} className="text-[#B4232F]" />
                     </div>
 
                     <div className="min-w-0">
@@ -1048,11 +975,7 @@ export default function ReservationSuccess({
             <section className="rounded-2xl border border-[#E4E4E4] bg-white p-5 shadow-[0_3px_18px_rgba(0,0,0,0.025)]">
               <div className="flex items-start gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EFFAF2]">
-                  <ShieldCheck
-                    size={17}
-                    className="text-[#188A3B]"
-                    aria-hidden="true"
-                  />
+                  <AdminIcon name="shield" size={18} className="text-[#16845B]" />
                 </div>
 
                 <div className="min-w-0">
@@ -1081,11 +1004,10 @@ export default function ReservationSuccess({
               onClick={onNewReservation}
               className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#CC0000] px-5 py-3.5 text-xs font-black text-white shadow-[0_8px_24px_rgba(204,0,0,0.18)] transition-all duration-200 hover:bg-[#A80000] hover:shadow-[0_10px_28px_rgba(204,0,0,0.24)] focus:outline-none focus:ring-2 focus:ring-[#CC0000] focus:ring-offset-2 active:scale-[0.99]"
             >
-              <PlusCircle
-                size={17}
-                strokeWidth={2}
+              <AdminIcon
+                name="plus-circle"
+                size={18}
                 className="transition-transform duration-200 group-hover:rotate-90"
-                aria-hidden="true"
               />
 
               Nouvelle réservation

@@ -1,73 +1,69 @@
-import {
-  CarFront,
-  KeyRound,
-  CalendarDays,
-  Wallet,
-  ChartNoAxesCombined,
-  Users,
-} from "lucide-react";
-
 import DashboardKpiCard from "./DashboardKpiCard";
 
-export default function DashboardKpiGrid() {
+import type {
+  DashboardKpis,
+} from "../../../api/services/adminDashboardService";
+
+interface DashboardKpiGridProps {
+  kpis: DashboardKpis;
+  loading?: boolean;
+}
+
+function formatHTG(value: string): string {
+  const amount = Number(value);
+
+  if (!Number.isFinite(amount)) {
+    return "0";
+  }
+
+  return new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+export default function DashboardKpiGrid({
+  kpis,
+  loading = false,
+}: DashboardKpiGridProps) {
+  const value = (amount: string | number) =>
+    loading ? "…" : String(amount);
+
   return (
-    <div
-      className="
-        grid
-        grid-cols-2
-        md:grid-cols-3
-        xl:grid-cols-6
-        gap-3
-      "
-    >
+    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-kjou-border bg-kjou-border md:grid-cols-3 xl:grid-cols-6">
       <DashboardKpiCard
         label="Flotte"
-        value="24"
+        value={value(kpis.total_vehicles)}
         description="Véhicules"
-        icon={CarFront}
-        color="blue"
       />
 
       <DashboardKpiCard
         label="Locations"
-        value="12"
+        value={value(kpis.active_rentals)}
         description="En cours"
-        icon={KeyRound}
-        color="orange"
       />
 
       <DashboardKpiCard
         label="Réservations"
-        value="18"
-        description="Cette période"
-        icon={CalendarDays}
-        color="purple"
+        value={value(kpis.reservations)}
+        description="Créées sur cette période"
       />
 
       <DashboardKpiCard
         label="Revenus"
-        value="125 400"
-        description="HTG · Cette période"
-        icon={Wallet}
-        color="green"
-        trend="+12,5%"
+        value={loading ? "…" : formatHTG(kpis.revenue_htg)}
+        description="HTG · Nets sur la période"
       />
 
       <DashboardKpiCard
         label="Occupation"
-        value="78%"
-        description="Taux moyen"
-        icon={ChartNoAxesCombined}
-        color="red"
-        trend="+6%"
+        value={value(`${kpis.occupancy_rate}%`)}
+        description="Véhicules en location"
       />
 
       <DashboardKpiCard
         label="Clients"
-        value="86"
+        value={value(kpis.active_clients)}
         description="Clients actifs"
-        icon={Users}
-        color="indigo"
       />
     </div>
   );

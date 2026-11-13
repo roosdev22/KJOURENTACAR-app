@@ -4,14 +4,8 @@ import {
   Car, Shield, Clock, Star, ChevronRight, Phone, MapPin,
   ArrowRight, Check, Users, Calendar, Award, Fuel,
   Settings, ChevronLeft, Quote,
-  MessageCircle, Mail, Play, X
+  Mail, Play, X
 } from "lucide-react";
-import ToyotaRav4 from "../../assets/images/toyota-rav4.jpg";
-//import hyundaiTucson from "../../assets/images/hyundai-tucson.jpg";
-//import toyotaCorolla from "../../assets/images/toyota-corolla.jpg";
-//import mitsubishiL200 from "../../assets/images/mitsubishi-l200.jpg";
-//import toyotaHilux from "../../assets/images/toyota-hilux.jpg";
-//import kiaSportage from "../../assets/images/kia-sportage.jpg";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Vehicle {
@@ -549,7 +543,7 @@ function HomePage() {
             {/* Ligne de connexion */}
             <div className="hidden md:block absolute top-10 left-[25%] right-[25%] h-px bg-red-600" />
 
-            {STEPS.map((step, i) => (
+            {STEPS.map((step) => (
               <div key={step.num} className="flex flex-col items-center text-center gap-4">
                 <div className="relative">
                   <div className="w-20 h-20 rounded-2xl bg-red-600/20 border border-red-600/30 flex items-center justify-center text-red-400">
